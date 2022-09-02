@@ -25,10 +25,18 @@ namespace HachijouBot.Commands
 
         public Task ExecuteSlashCommand(SocketSlashCommand command)
         {
-            Command? commandFound = Commands.Find(co => co.Name == command.CommandName);
+            try
+            {
+                Command? commandFound = Commands.Find(co => co.Name == command.CommandName);
 
-            if (commandFound != null) return commandFound.CommandHandler(command);
-            return command.RespondAsync("Command not found");
+                if (commandFound != null) return commandFound.CommandHandler(command);
+                return command.RespondAsync("Command not found");
+            }
+            catch (Exception ex)
+            {
+                Hachijou.HandleError(ex);
+                return command.RespondAsync("An error occured");
+            }
         }
 
         public void InitializeAllCommands()
@@ -39,6 +47,11 @@ namespace HachijouBot.Commands
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.LoadCommands();
+
+            foreach (CustomCommand command in CustomCommandDatabase.CommandsLoaded)
+            {
+                AddCommand(command);
+            }
         }
 
         public async void AddCommand(Command command)

@@ -65,6 +65,14 @@ namespace HachijouBot
             await client.CreateGlobalApplicationCommandAsync(botCommand.Build());
         }
 
+        public void HandleError(Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+
+            SocketTextChannel? logChannel = (client.GetChannel(691967799957913610) as SocketTextChannel);
+            logChannel?.SendMessageAsync(ex.ToString());
+        }
+
         private Task Log(LogMessage log)
         {
             Console.WriteLine(log.ToString());

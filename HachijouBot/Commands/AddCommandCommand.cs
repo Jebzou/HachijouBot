@@ -33,6 +33,7 @@ namespace HachijouBot.Commands
 
             Options.Add(new SlashCommandOptionBuilder()
                 .WithType(ApplicationCommandOptionType.String)
+                .WithRequired(true)
                 .WithName("commanddescription")
                 .WithDescription("The description of the command"));
         }
@@ -50,7 +51,7 @@ namespace HachijouBot.Commands
                 if (option.Name == "commandreply") commandReply = option.Value?.ToString() ?? "";
             }
 
-            if (string.IsNullOrEmpty(commandName) || string.IsNullOrEmpty(commandReply)) return command.RespondAsync("Invalid parameters");
+            if (string.IsNullOrEmpty(commandName) || string.IsNullOrEmpty(commandReply) || string.IsNullOrEmpty(commandDescription)) return command.RespondAsync("Invalid parameters");
 
             CustomCommandDatabase.AddCommand(new CustomCommand(commandName, commandDescription, commandReply));
 
