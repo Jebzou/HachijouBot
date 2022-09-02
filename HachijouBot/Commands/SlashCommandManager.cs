@@ -44,6 +44,7 @@ namespace HachijouBot.Commands
             Commands.Clear();
 
             AddCommand(new AddCommandCommand());
+            AddCommand(new ScrapCommand());
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.LoadCommands();

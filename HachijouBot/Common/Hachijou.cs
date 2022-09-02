@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using HachijouBot.Commands;
+using HachijouBot.Common;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -86,10 +87,25 @@ namespace HachijouBot
             // This basically resets commands
             client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[0]);
 
+            LoadEmotes();
+
             CustomCommandManager = new SlashCommandManager(this);
             client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
 
+            Console.WriteLine($"Done loading");
+
             return Task.CompletedTask;
+        }
+
+        private void LoadEmotes()
+        {
+            IEnumerable<GuildEmote> emotes = client.Guilds.SelectMany(g => g.Emotes);
+
+            foreach (string key in EmoteDataBase.Emotes.Keys)
+            {
+                GuildEmote? emote = emotes.FirstOrDefault(e => e.Name == key);
+                if (emote != null) EmoteDataBase.Emotes[key] = $"<:{emote.Name}:{emote.Id}>";
+            }
         }
     }
 }
