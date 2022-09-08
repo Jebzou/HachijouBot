@@ -19,5 +19,6 @@ namespace HachijouBot.Commands
         public List<SlashCommandOptionBuilder> Options { get; set; } = new List<SlashCommandOptionBuilder>();
 
         public virtual GuildPermission? GuildPermission { get; set; }
+
     }
 }

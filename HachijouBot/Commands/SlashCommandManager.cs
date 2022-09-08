@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using HachijouBot.Commands.MapInfo;
 using HachijouBot.Common;
 using System;
 using System.Collections.Generic;
@@ -41,10 +42,16 @@ namespace HachijouBot.Commands
 
         public void InitializeAllCommands()
         {
+            Hachijou.ClearCommands();
+
             Commands.Clear();
 
             AddCommand(new AddCommandCommand());
             AddCommand(new ScrapCommand());
+
+            AddCommand(new AddMapInfoCommand());
+            AddCommand(new GetMapInfoCommand());
+            MapInfoDatabase.OnMapInfoAdd += (_, command) => InitializeAllCommands();
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.LoadCommands();

@@ -80,12 +80,15 @@ namespace HachijouBot
             return Task.CompletedTask;
         }
 
+        public void ClearCommands()
+        {
+            // This basically resets commands
+            client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[0]);
+        }
+
         private Task Ready()
         {
             Console.WriteLine($"Connected");
-
-            // This basically resets commands
-            client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[0]);
 
             LoadEmotes();
 
