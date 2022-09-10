@@ -64,6 +64,11 @@ namespace HachijouBot
 
             // With global commands we don't need the guild.
             await client.CreateGlobalApplicationCommandAsync(botCommand.Build());
+
+            command.OptionsChanged += (_, _) =>
+            {
+                AddSlashCommand(command);
+            };
         }
 
         public void HandleError(Exception ex)

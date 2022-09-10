@@ -20,5 +20,17 @@ namespace HachijouBot.Commands
 
         public virtual GuildPermission? GuildPermission { get; set; }
 
+        public virtual void InitOptions()
+        {
+            Options.Clear();
+        }
+
+        public event EventHandler<EventArgs>? OptionsChanged;
+
+        public void TriggerOptionsChanged()
+        {
+            OptionsChanged?.Invoke(this, new EventArgs());
+        }
+
     }
 }

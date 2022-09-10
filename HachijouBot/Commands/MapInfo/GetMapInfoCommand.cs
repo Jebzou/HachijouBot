@@ -18,11 +18,18 @@ namespace HachijouBot.Commands.MapInfo
         public GetMapInfoCommand()
         {
             InitOptions();
+            MapInfoDatabase.OnMapInfoAdd += MapInfoDatabase_OnMapInfoAdd;
         }
 
-        private void InitOptions()
+        private void MapInfoDatabase_OnMapInfoAdd(object? sender, MapInfoModel e)
         {
-            Options.Clear();
+            InitOptions();
+            TriggerOptionsChanged();
+        }
+
+        public override void InitOptions()
+        {
+            base.InitOptions();
 
             SlashCommandOptionBuilder areas = new SlashCommandOptionBuilder()
                 .WithType(ApplicationCommandOptionType.Number)
