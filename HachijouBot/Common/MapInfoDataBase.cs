@@ -19,7 +19,7 @@ namespace HachijouBot.Common
         public static void AddMapInfo(MapInfoModel mapInfoToAdd)
         {
             MapsLoaded.Add(mapInfoToAdd);
-            JsonHelper.WriteJson(Path, MapsLoaded);
+            SaveMapInfos();
 
             OnMapInfoAdd?.Invoke(null, mapInfoToAdd);
         }
@@ -31,6 +31,11 @@ namespace HachijouBot.Common
             if (!File.Exists(Path)) return;
 
             MapsLoaded = JsonHelper.ReadJson<List<MapInfoModel>>(Path);
+        }
+
+        public static void SaveMapInfos()
+        {
+            JsonHelper.WriteJson(Path, MapsLoaded);
         }
 
         public static MapInfoModel? GetMapInfos(MapInfoModel baseModel) 

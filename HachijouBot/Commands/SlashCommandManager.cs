@@ -51,6 +51,7 @@ namespace HachijouBot.Commands
 
             AddCommand(new AddMapInfoCommand());
             AddCommand(new GetMapInfoCommand());
+            AddCommand(new EditMapInfoCommand());
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.LoadCommands();
