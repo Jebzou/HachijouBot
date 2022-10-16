@@ -8,24 +8,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace HachijouBot
 {
     public class Hachijou
     {
-        private DiscordSocketClient client;
+        public DiscordSocketClient Client { get; private set; }
 
         private SlashCommandManager CustomCommandManager;
 
+        private BooruManager.BooruManager BooruManager { get; set; }
+
         public async Task Initialize()
         {
-            client = new DiscordSocketClient();
+            Client = new DiscordSocketClient();
 
             //Hook into log event and write it out to the console
-            client.Log += Log;
+            Client.Log += Log;
 
             //Hook into the client ready event
-            client.Ready += Ready;
+            Client.Ready += Ready;
 
             //Create the configuration
             var _builder = new ConfigurationBuilder()
@@ -35,8 +38,8 @@ namespace HachijouBot
             IConfiguration config = _builder.Build();
 
             //This is where we get the Token value from the configuration file
-            await client.LoginAsync(TokenType.Bot, config["Token"]);
-            await client.StartAsync();
+            await Client.LoginAsync(TokenType.Bot, config["Token"]);
+            await Client.StartAsync();
         }
 
 
@@ -63,7 +66,7 @@ namespace HachijouBot
             botCommand.AddOptions(command.Options.ToArray());
 
             // With global commands we don't need the guild.
-            await client.CreateGlobalApplicationCommandAsync(botCommand.Build());
+            await Client.CreateGlobalApplicationCommandAsync(botCommand.Build());
 
             command.OptionsChanged += (_, _) =>
             {
@@ -75,7 +78,7 @@ namespace HachijouBot
         {
             Console.WriteLine(ex.ToString());
 
-            SocketTextChannel? logChannel = (client.GetChannel(691967799957913610) as SocketTextChannel);
+            SocketTextChannel? logChannel = (Client.GetChannel(691967799957913610) as SocketTextChannel);
             logChannel?.SendMessageAsync(ex.ToString());
         }
 
@@ -88,7 +91,7 @@ namespace HachijouBot
         public void ClearCommands()
         {
             // This basically resets commands
-            client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[0]);
+            Client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[0]);
         }
 
         private Task Ready()
@@ -98,16 +101,39 @@ namespace HachijouBot
             LoadEmotes();
 
             CustomCommandManager = new SlashCommandManager(this);
-            client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
+            Client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
 
-            Console.WriteLine($"Done loading");
+            Console.WriteLine($"Done loading Discord");
+
+            // Load danbooru
+            Console.WriteLine($"Loading Danbooru");
+            LoadDanbooru();
+
+            Console.WriteLine($"Done loading Danbooru");
 
             return Task.CompletedTask;
         }
 
+        private void LoadDanbooru()
+        {
+            BooruManager = new BooruManager.BooruManager(this);
+            BooruManager.CheckMissingPics();
+
+            System.Timers.Timer timer = new System.Timers.Timer(10000);
+
+            timer.Elapsed += OnDanbooruLoadPics;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+        }
+
+        private void OnDanbooruLoadPics(object? source, ElapsedEventArgs e)
+        {
+            BooruManager.CheckMissingPics();
+        }
+
         private void LoadEmotes()
         {
-            IEnumerable<GuildEmote> emotes = client.Guilds.SelectMany(g => g.Emotes);
+            IEnumerable<GuildEmote> emotes = Client.Guilds.SelectMany(g => g.Emotes);
 
             foreach (string key in EmoteDataBase.Emotes.Keys)
             {

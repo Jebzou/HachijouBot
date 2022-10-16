@@ -46,6 +46,8 @@ namespace HachijouBot.Commands
 
             Commands.Clear();
 
+            AddCommand(new AddDanbooruWatcherCommand());
+
             AddCommand(new AddCommandCommand());
             AddCommand(new ScrapCommand());
 
