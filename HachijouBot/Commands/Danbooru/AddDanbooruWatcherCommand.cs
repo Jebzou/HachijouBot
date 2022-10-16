@@ -25,7 +25,7 @@ namespace HachijouBot.Commands.MapInfo
                 .WithType(ApplicationCommandOptionType.String)
                 .WithRequired(true)
                 .WithName("tags")
-                .WithDescription("Tags to watch (seprated by ,)"));
+                .WithDescription("Tags to watch (separated by ,)"));
 
         }
 

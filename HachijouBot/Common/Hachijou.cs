@@ -119,7 +119,7 @@ namespace HachijouBot
             BooruManager = new BooruManager.BooruManager(this);
             BooruManager.CheckMissingPics();
 
-            System.Timers.Timer timer = new System.Timers.Timer(10000);
+            System.Timers.Timer timer = new System.Timers.Timer(18e5);
 
             timer.Elapsed += OnDanbooruLoadPics;
             timer.AutoReset = true;
