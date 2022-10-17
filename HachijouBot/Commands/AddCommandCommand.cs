@@ -53,7 +53,9 @@ namespace HachijouBot.Commands
 
             if (string.IsNullOrEmpty(commandName) || string.IsNullOrEmpty(commandReply) || string.IsNullOrEmpty(commandDescription)) return command.RespondAsync("Invalid parameters");
 
-            CustomCommandDatabase.AddCommand(new CustomCommand(commandName, commandDescription, commandReply));
+            if (command.GuildId is null) return command.RespondAsync("Can't execute this command outside of a server");
+
+            CustomCommandDatabase.AddCommand(new CustomCommand(commandName, commandDescription, commandReply, (ulong)command.GuildId));
 
             return command.RespondAsync("Command added !");
         }

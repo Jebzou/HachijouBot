@@ -82,8 +82,16 @@ namespace HachijouBot
 
             botCommand.AddOptions(command.Options.ToArray());
 
-            // With global commands we don't need the guild.
-            await Client.CreateGlobalApplicationCommandAsync(botCommand.Build());
+            if (command is CustomCommand customCommand)
+            {
+                // With global commands we don't need the guild.
+                await Client.GetGuild(customCommand.GuildId).CreateApplicationCommandAsync(botCommand.Build());
+            }
+            else
+            {
+                // With global commands we don't need the guild.
+                await Client.CreateGlobalApplicationCommandAsync(botCommand.Build());
+            }
 
             command.OptionsChanged += (_, _) =>
             {
@@ -109,6 +117,11 @@ namespace HachijouBot
         {
             // This basically resets commands
             Client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[0]);
+
+            foreach (SocketGuild guild in Client.Guilds)
+            {
+                guild.BulkOverwriteApplicationCommandAsync(new ApplicationCommandProperties[0]);
+            }
         }
 
         private Task Ready()

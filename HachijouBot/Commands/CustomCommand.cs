@@ -12,15 +12,20 @@ namespace HachijouBot.Commands
 
         public string TextToReturn { get; set; } = "";
 
-        public CustomCommand(string name, string description, string reply)
+        public ulong GuildId { get; set; }
+
+        public CustomCommand(string name, string description, string reply, ulong guildId)
         {
             CustomName = name;
             CustomDescription = description;
             TextToReturn = reply;
+            GuildId = guildId;
         }
 
         public override Task CommandHandler(SocketSlashCommand command)
         {
+            if (command.GuildId != GuildId) return command.RespondAsync("Command not found");
+
             return command.RespondAsync(TextToReturn);
         }
     }
