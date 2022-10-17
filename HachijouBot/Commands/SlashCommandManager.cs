@@ -1,7 +1,9 @@
 ﻿using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using HachijouBot.Commands.Danbooru;
 using HachijouBot.Commands.MapInfo;
+using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
 using System;
 using System.Collections.Generic;
@@ -34,6 +36,16 @@ namespace HachijouBot.Commands
                 if (commandFound != null) return commandFound.CommandHandler(command);
                 return command.RespondAsync("Command not found");
             }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerExceptions.FirstOrDefault() is HttpException discordEx)
+                {
+                    return command.RespondAsync(discordEx.Reason);
+                }
+
+                Hachijou.HandleError(ex);
+                return command.RespondAsync("An error occured");
+            }
             catch (Exception ex)
             {
                 Hachijou.HandleError(ex);
@@ -51,6 +63,9 @@ namespace HachijouBot.Commands
             AddCommand(new GetRandomPicture());
 
             AddCommand(new AddCommandCommand());
+
+            AddCommand(new AddRoleCommandCommand());
+
             AddCommand(new ScrapCommand());
 
             AddCommand(new AddMapInfoCommand());
@@ -63,6 +78,14 @@ namespace HachijouBot.Commands
             CustomCommandDatabase.LoadCommands();
 
             foreach (CustomCommand command in CustomCommandDatabase.CommandsLoaded)
+            {
+                AddCommand(command);
+            }
+
+            RoleCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
+            RoleCommandDatabase.LoadCommands();
+
+            foreach (RoleCommand command in RoleCommandDatabase.CommandsLoaded)
             {
                 AddCommand(command);
             }
