@@ -82,10 +82,10 @@ namespace HachijouBot
 
             botCommand.AddOptions(command.Options.ToArray());
 
-            if (command is CustomCommand customCommand)
+            if (command.GuildId is ulong guildId)
             {
                 // With global commands we don't need the guild.
-                await Client.GetGuild(customCommand.GuildId).CreateApplicationCommandAsync(botCommand.Build());
+                await Client.GetGuild(guildId).CreateApplicationCommandAsync(botCommand.Build());
             }
             else
             {

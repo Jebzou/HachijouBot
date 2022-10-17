@@ -29,7 +29,7 @@ namespace HachijouBot.Commands
         {
             try
             {
-                Command? commandFound = Commands.Find(co => co.Name == command.CommandName);
+                Command? commandFound = Commands.Find(co => co.Name == command.CommandName && (co.GuildId is null || co.GuildId == command.GuildId));
 
                 if (commandFound != null) return commandFound.CommandHandler(command);
                 return command.RespondAsync("Command not found");

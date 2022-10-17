@@ -12,8 +12,6 @@ namespace HachijouBot.Commands
 
         public string TextToReturn { get; set; } = "";
 
-        public ulong GuildId { get; set; }
-
         public CustomCommand(string name, string description, string reply, ulong guildId)
         {
             CustomName = name;
