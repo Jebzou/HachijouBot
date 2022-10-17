@@ -16,7 +16,7 @@ namespace HachijouBot.BooruManager
 
         public async Task<List<string>> GetNewImagesAsync()
         {
-            var client = new DanbooruDonmai();
+            var client = new DanbooruDonmai(new HttpClient());
 
             Post[] posts = await client.PostListAsync(50, WatcherInfos.Tags.ToArray());
 
