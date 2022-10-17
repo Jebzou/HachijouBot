@@ -39,6 +39,15 @@ namespace HachijouBot.BooruManager
 
             return posts.Select(post => post.PostUrl).ToList();
         }
+
+        public async Task<string> GetRandomImage()
+        {
+            var client = new DanbooruDonmai(new HttpClient());
+
+            Post post = await client.GetRandomPostAsync(WatcherInfos.Tags.ToArray());
+
+            return post.PostUrl;
+        }
     }
 
 }

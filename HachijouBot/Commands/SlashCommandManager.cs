@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using HachijouBot.Commands.Danbooru;
 using HachijouBot.Commands.MapInfo;
 using HachijouBot.Common;
 using System;
@@ -47,6 +48,7 @@ namespace HachijouBot.Commands
             Commands.Clear();
 
             AddCommand(new AddDanbooruWatcherCommand());
+            AddCommand(new GetRandomPicture());
 
             AddCommand(new AddCommandCommand());
             AddCommand(new ScrapCommand());
