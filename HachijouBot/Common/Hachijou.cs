@@ -20,9 +20,13 @@ namespace HachijouBot
 
         private BooruManager.BooruManager BooruManager { get; set; }
 
+        private IConfiguration Configuration { get; set; }
+
         public async Task Initialize()
         {
             Client = new DiscordSocketClient();
+
+            Client.JoinedGuild += Client_JoinedGuild;
 
             //Hook into log event and write it out to the console
             Client.Log += Log;
@@ -35,13 +39,26 @@ namespace HachijouBot
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile(path: "config.json");
 
-            IConfiguration config = _builder.Build();
+            Configuration = _builder.Build();
 
             //This is where we get the Token value from the configuration file
-            await Client.LoginAsync(TokenType.Bot, config["Token"]);
+            await Client.LoginAsync(TokenType.Bot, Configuration["Token"]);
             await Client.StartAsync();
         }
 
+        private Task Client_JoinedGuild(SocketGuild arg)
+        {
+            string? _ownerId = Configuration["OwnerId"];
+
+            if (_ownerId is string _ownerIdNotNull)
+            {
+                Client.GetUser(ulong.Parse(_ownerIdNotNull)).SendMessageAsync($"I joined a new server : {arg.Name} monkaS");
+            }  
+
+            Console.WriteLine($"I joined a new server : {arg.Name} monkaS");
+
+            return Task.CompletedTask;
+        }
 
         public async Task AddSlashCommand(Command command)
         {
