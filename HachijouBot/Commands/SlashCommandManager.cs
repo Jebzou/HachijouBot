@@ -2,6 +2,7 @@
 using Discord.Net;
 using Discord.WebSocket;
 using HachijouBot.Commands.Danbooru;
+using HachijouBot.Commands.ManageDatabase;
 using HachijouBot.Commands.MapInfo;
 using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
@@ -73,6 +74,8 @@ namespace HachijouBot.Commands
             AddCommand(new EditMapInfoCommand());
 
             AddCommand(new InviteCommand());
+
+            AddCommand(new ManageDatabaseCommand());
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.LoadCommands();

@@ -21,7 +21,7 @@ namespace HachijouBot
         {
             //This is where we get the Token value from the configuration file
 
-            Hachijou hachiChan = new Hachijou();
+            Hachijou hachiChan = Hachijou.GetInstance();
             await hachiChan.Initialize();
 
             // Block the program until it is closed.

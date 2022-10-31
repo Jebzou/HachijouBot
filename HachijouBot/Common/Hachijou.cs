@@ -2,19 +2,25 @@
 using Discord.WebSocket;
 using HachijouBot.Commands;
 using HachijouBot.Common;
+using HachijouBot.Extensions;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace HachijouBot
 {
     public class Hachijou
     {
-        public DiscordSocketClient Client { get; private set; }
+        public static Hachijou GetInstance()
+        {
+            if (HachijouChan is null) HachijouChan = new Hachijou();
+            return HachijouChan;
+        }
+
+        private static Hachijou? HachijouChan { get; set; }
+
+        private Hachijou() { }
+
+        public HachijouDiscordSocketClient Client { get; private set; }
 
         private SlashCommandManager CustomCommandManager;
 
@@ -24,7 +30,7 @@ namespace HachijouBot
 
         public async Task Initialize()
         {
-            Client = new DiscordSocketClient();
+            Client = new HachijouDiscordSocketClient();
 
             Client.JoinedGuild += Client_JoinedGuild;
 
@@ -41,6 +47,8 @@ namespace HachijouBot
 
             Configuration = _builder.Build();
 
+            Client.BotOwnerId = ulong.Parse(Configuration["OwnerId"] ?? "0");
+
             //This is where we get the Token value from the configuration file
             await Client.LoginAsync(TokenType.Bot, Configuration["Token"]);
             await Client.StartAsync();
@@ -53,7 +61,7 @@ namespace HachijouBot
             if (_ownerId is string _ownerIdNotNull)
             {
                 Client.GetUser(ulong.Parse(_ownerIdNotNull)).SendMessageAsync($"I joined a new server : {arg.Name} monkaS");
-            }  
+            }
 
             Console.WriteLine($"I joined a new server : {arg.Name} monkaS");
 
