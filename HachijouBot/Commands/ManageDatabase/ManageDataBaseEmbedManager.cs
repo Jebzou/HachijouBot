@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using HachijouBot.BooruManager;
+using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
 using HachijouBot.Models;
 using System.Data;
@@ -28,6 +29,8 @@ namespace HachijouBot.Commands.ManageDatabase
         {
             List<SelectMenuOptionBuilder> selectMenuBuilder = new List<SelectMenuOptionBuilder>
             {
+                BuildDataBaseComponent("Role commands", "roleCommand"),
+                BuildDataBaseComponent("Custom commands", "customCommand"),
                 BuildDataBaseComponent("Map infos", "mapInfos"),
                 BuildDataBaseComponent("Danbooru watchers", "danbooruWatchers")
             };
@@ -69,6 +72,12 @@ namespace HachijouBot.Commands.ManageDatabase
                     break;
                 case "mapInfos":
                     DataBase = new MapInfoDatabase();
+                    break;
+                case "roleCommand":
+                    DataBase = new RoleCommandDatabase();
+                    break;
+                case "customCommand":
+                    DataBase = new CustomCommandDatabase();
                     break;
             }
 

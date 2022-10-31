@@ -1,13 +1,10 @@
 ﻿using HachijouBot.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HachijouBot.Models;
+using System.Data;
 
 namespace HachijouBot.Commands.Roles
 {
-    public static class RoleCommandDatabase
+    public class RoleCommandDatabase : IDataBase
     {
         private const string CommandPath = "RoleCommands.json";
 
@@ -30,6 +27,28 @@ namespace HachijouBot.Commands.Roles
             if (!File.Exists(CommandPath)) return;
 
             CommandsLoaded = JsonHelper.ReadJson<List<RoleCommand>>(CommandPath);
+        }
+
+
+        public DataTable GetData()
+        {
+            DataTable results = new DataTable();
+
+            results.Columns.Add("Guild");
+            results.Columns.Add("Name");
+            results.Columns.Add("Description");
+            results.Columns.Add("Role");
+
+            foreach (RoleCommand command in CommandsLoaded)
+            {
+                string guildName = "Global";
+
+                if (command.GuildId != null) guildName = Hachijou.GetInstance().Client.GetGuild((ulong)command.GuildId).Name;
+
+                results.Rows.Add(guildName, command.Name, command.Description, command.RoleName);
+            }
+
+            return results;
         }
     }
 }
