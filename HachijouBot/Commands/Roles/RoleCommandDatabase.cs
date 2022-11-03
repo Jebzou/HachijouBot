@@ -44,8 +44,17 @@ namespace HachijouBot.Commands.Roles
             CommandsLoaded = JsonHelper.ReadJson<List<RoleCommand>>(CommandPath);
         }
 
+        public DataTable GetData(ulong guildId)
+        {
+            return GetData(CommandsLoaded.Where(c => c.GuildId == guildId).ToList());
+        }
 
         public DataTable GetData()
+        {
+            return GetData(CommandsLoaded);
+        }
+
+        private DataTable GetData(List<RoleCommand> commands)
         {
             DataTable results = new DataTable();
 
@@ -54,7 +63,7 @@ namespace HachijouBot.Commands.Roles
             results.Columns.Add("Description");
             results.Columns.Add("Role");
 
-            foreach (RoleCommand command in CommandsLoaded)
+            foreach (RoleCommand command in commands)
             {
                 string guildName = "Global";
 

@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using HachijouBot.BooruManager.Models;
 using HachijouBot.Common;
 using HachijouBot.Models;
+using Microsoft.Extensions.FileSystemGlobbing;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -53,7 +54,17 @@ namespace HachijouBot.BooruManager
             JsonHelper.WriteJson(Path, Watchers);
         }
 
+        public DataTable GetData(ulong guildId)
+        {
+            return GetData(Watchers.Where(c => ((ITextChannel)Hachijou.GetInstance().Client.GetChannel(c.ChannelId ?? 0)).GuildId == guildId).ToList());
+        }
+
         public DataTable GetData()
+        {
+            return GetData(Watchers);
+        }
+
+        private DataTable GetData(List<DanbooruWatcherChannelModel> commands)
         {
             DataTable results = new DataTable();
 
@@ -62,7 +73,7 @@ namespace HachijouBot.BooruManager
             results.Columns.Add("Tags");
             results.Columns.Add("Last Id");
 
-            foreach (DanbooruWatcherChannelModel watcher in Watchers)
+            foreach (DanbooruWatcherChannelModel watcher in commands)
             {
                 string guildName = "";
                 string channelName = "";

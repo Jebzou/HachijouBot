@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using HachijouBot.Extensions;
 
 namespace HachijouBot.Commands.ManageDatabase
@@ -8,12 +9,16 @@ namespace HachijouBot.Commands.ManageDatabase
         public override string Name => "managedatabase";
         public override string Description => "Manage the databases of the bot";
 
+        public override GuildPermission? GuildPermission => Discord.GuildPermission.Administrator;
+
         public override Task CommandHandler(SocketSlashCommand command)
         {
-            if (!command.User.IsBotOwner()) 
-                return command.RespondAsync("Not enough permission");
+            ManageDataBaseEmbedManager databaseManagment = new ManageDataBaseEmbedManager();
 
-            return command.RespondAsync("Select a database to view", components: new ManageDataBaseEmbedManager().Build());
+            databaseManagment.IsOwner = command.User.IsBotOwner();
+            databaseManagment.UserId = command.User.Id;
+
+            return command.RespondAsync("Select a database to view", components: databaseManagment.Build());
 
         }
     }

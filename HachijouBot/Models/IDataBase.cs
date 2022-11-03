@@ -10,5 +10,7 @@ namespace HachijouBot.Models
     public interface IDataBase
     {
         public DataTable GetData();
+
+        public DataTable GetData(ulong guildID);
     }
 }

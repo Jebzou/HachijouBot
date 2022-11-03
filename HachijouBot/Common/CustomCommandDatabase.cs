@@ -1,4 +1,5 @@
 ﻿using HachijouBot.Commands;
+using HachijouBot.Commands.Roles;
 using HachijouBot.Models;
 using System.Data;
 
@@ -44,7 +45,17 @@ namespace HachijouBot.Common
             CommandsLoaded = JsonHelper.ReadJson<List<CustomCommand>>(CommandPath);
         }
 
+        public DataTable GetData(ulong guildId)
+        {
+            return GetData(CommandsLoaded.Where(c => c.GuildId == guildId).ToList());
+        }
+
         public DataTable GetData()
+        {
+            return GetData(CommandsLoaded);
+        }
+
+        private DataTable GetData(List<CustomCommand> commands)
         {
             DataTable results = new DataTable();
 
@@ -53,7 +64,7 @@ namespace HachijouBot.Common
             results.Columns.Add("Description");
             results.Columns.Add("Text to return");
 
-            foreach (CustomCommand command in CommandsLoaded)
+            foreach (CustomCommand command in commands)
             {
                 string guildName = "Global";
 

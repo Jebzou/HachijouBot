@@ -19,7 +19,10 @@ namespace HachijouBot.Commands.ManageDatabase
 
         private int RecordId { get; set; } = 0;
 
-        IDataBase? DataBase { get; set; }
+        private IDataBase? DataBase { get; set; }
+
+        public bool IsOwner { get; set; } = false;
+        public ulong UserId { get; set; } = 0;
 
         public ManageDataBaseEmbedManager()
         {
@@ -46,7 +49,9 @@ namespace HachijouBot.Commands.ManageDatabase
 
         private async Task ButtonClicked(SocketMessageComponent arg)
         {
-            if (!arg.User.IsBotOwner()) return;
+            if (arg.GuildId is null) return;
+            if (arg.User.Id != UserId) return;
+            if (!arg.User.IsAdmin((ulong)arg.GuildId)) return;
 
             if (arg.Data.CustomId == PreviousId)
             {
@@ -66,7 +71,9 @@ namespace HachijouBot.Commands.ManageDatabase
 
         private async Task SelectMenuHandler(SocketMessageComponent arg)
         {
-            if (!arg.User.IsBotOwner()) return;
+            if (arg.GuildId is null) return;
+            if (!arg.User.IsAdmin((ulong)arg.GuildId)) return;
+            if (arg.User.Id != UserId) return;
             if (arg.Data.CustomId != EmbedId) return;
 
             switch (arg.Data.Values.FirstOrDefault())
@@ -105,7 +112,7 @@ namespace HachijouBot.Commands.ManageDatabase
                 return;
             }
 
-            DataTable dt = DataBase.GetData();
+            DataTable dt = IsOwner ? DataBase.GetData() : DataBase.GetData((ulong)arg.GuildId);
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithTitle($"Displaying database ({RecordId + 1}/{dt.Rows.Count})");

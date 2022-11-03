@@ -1,4 +1,5 @@
-﻿using HachijouBot.Models;
+﻿using HachijouBot.Commands;
+using HachijouBot.Models;
 using System.Data;
 
 namespace HachijouBot.Common
@@ -42,7 +43,17 @@ namespace HachijouBot.Common
             return val;
         }
 
+        public DataTable GetData(ulong guildId)
+        {
+            return GetData(MapsLoaded.Where(c => c.GuildId == guildId).ToList());
+        }
+
         public DataTable GetData()
+        {
+            return GetData(MapsLoaded);
+        }
+
+        private DataTable GetData(List<MapInfoModel> commands)
         {
             DataTable results = new DataTable();
 
@@ -51,7 +62,7 @@ namespace HachijouBot.Common
             results.Columns.Add("Map ID");
             results.Columns.Add("Reply");
 
-            foreach (MapInfoModel map in MapsLoaded)
+            foreach (MapInfoModel map in commands)
             {
                 string guildName = "";
                 
