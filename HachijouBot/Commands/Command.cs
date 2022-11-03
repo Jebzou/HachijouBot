@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace HachijouBot.Commands
         public virtual GuildPermission? GuildPermission { get; set; }
 
         public virtual ulong? GuildId { get; protected set; } = null;
-
+        
         public virtual void InitOptions()
         {
             Options.Clear();

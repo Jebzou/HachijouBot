@@ -63,7 +63,8 @@ namespace HachijouBot.Commands
             AddCommand(new AddDanbooruWatcherCommand());
             AddCommand(new GetRandomPicture());
 
-            AddCommand(new AddCommandCommand());
+            AddCommand(new AddCommandCommand()); 
+            AddCommand(new DeleteCommandCommand()); 
 
             AddCommand(new AddRoleCommandCommand());
 
@@ -78,6 +79,7 @@ namespace HachijouBot.Commands
             AddCommand(new ManageDatabaseCommand());
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
+            CustomCommandDatabase.OnCommandDelete += RemoveCommand;
             CustomCommandDatabase.LoadCommands();
 
             foreach (CustomCommand command in CustomCommandDatabase.CommandsLoaded)
@@ -86,12 +88,20 @@ namespace HachijouBot.Commands
             }
 
             RoleCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
+            RoleCommandDatabase.OnCommandDelete += RemoveCommand;
             RoleCommandDatabase.LoadCommands();
 
             foreach (RoleCommand command in RoleCommandDatabase.CommandsLoaded)
             {
                 AddCommand(command);
             }
+        }
+
+        private async void RemoveCommand(object? sender, Command command)
+        {
+            Commands.Remove(command);
+
+            Hachijou.RemoveSlashCommand(command);
         }
 
         public async void AddCommand(Command command)

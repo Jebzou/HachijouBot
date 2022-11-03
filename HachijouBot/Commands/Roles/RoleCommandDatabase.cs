@@ -11,6 +11,21 @@ namespace HachijouBot.Commands.Roles
         public static List<RoleCommand> CommandsLoaded = new List<RoleCommand>();
 
         public static event EventHandler<RoleCommand>? OnCommandAdd;
+        public static event EventHandler<RoleCommand>? OnCommandDelete;
+
+        public static void DeleteCommand(RoleCommand roleCommandToDelete)
+        {
+            bool deleted = CommandsLoaded.Remove(roleCommandToDelete);
+
+            if (!deleted)
+            {
+                throw new Exception("Command not found");
+            }
+
+            JsonHelper.WriteJson(CommandPath, CommandsLoaded);
+
+            OnCommandDelete?.Invoke(null, roleCommandToDelete);
+        }
 
         public static void AddCommand(RoleCommand commandToAdd)
         {

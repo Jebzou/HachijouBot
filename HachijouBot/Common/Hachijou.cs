@@ -98,13 +98,32 @@ namespace HachijouBot
             else
             {
                 // With global commands we don't need the guild.
-                await Client.CreateGlobalApplicationCommandAsync(botCommand.Build());
+               await Client.CreateGlobalApplicationCommandAsync(botCommand.Build());
             }
 
             command.OptionsChanged += (_, _) =>
             {
                 AddSlashCommand(command);
             };
+        }
+
+        public void RemoveSlashCommand(Command command)
+        {
+            // it doesn't seem to work, 
+
+            /*if (command.SocketCommand is null) return;
+            if (command.GuildId is null)
+            {
+                command.SocketCommand = await Client.GetGlobalApplicationCommandAsync(command.SocketCommand.Id);
+                await command.SocketCommand.DeleteAsync();
+            }
+            else
+            {
+                // With global commands we don't need the guild.
+                command.SocketCommand = await Client.GetGuild((ulong)command.GuildId).GetApplicationCommandAsync(command.SocketCommand.Id);
+                await command.SocketCommand.DeleteAsync();
+            }*/
+                
         }
 
         public void HandleError(Exception ex)

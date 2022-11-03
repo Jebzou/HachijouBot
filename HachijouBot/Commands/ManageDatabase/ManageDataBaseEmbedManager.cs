@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using HachijouBot.BooruManager;
 using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
+using HachijouBot.Extensions;
 using HachijouBot.Models;
 using System.Data;
 
@@ -45,6 +46,8 @@ namespace HachijouBot.Commands.ManageDatabase
 
         private async Task ButtonClicked(SocketMessageComponent arg)
         {
+            if (!arg.User.IsBotOwner()) return;
+
             if (arg.Data.CustomId == PreviousId)
             {
                 RecordId--;
@@ -63,6 +66,7 @@ namespace HachijouBot.Commands.ManageDatabase
 
         private async Task SelectMenuHandler(SocketMessageComponent arg)
         {
+            if (!arg.User.IsBotOwner()) return;
             if (arg.Data.CustomId != EmbedId) return;
 
             switch (arg.Data.Values.FirstOrDefault())

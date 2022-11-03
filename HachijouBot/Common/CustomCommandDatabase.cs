@@ -11,6 +11,21 @@ namespace HachijouBot.Common
         public static List<CustomCommand> CommandsLoaded = new List<CustomCommand>();
 
         public static event EventHandler<CustomCommand>? OnCommandAdd;
+        public static event EventHandler<CustomCommand>? OnCommandDelete;
+
+        public static void DeleteCommand(CustomCommand customCommandToDelete)
+        {
+            bool deleted = CommandsLoaded.Remove(customCommandToDelete);
+
+            if (!deleted)
+            {
+                throw new Exception("Command not found");
+            }
+
+            JsonHelper.WriteJson(CommandPath, CommandsLoaded);
+
+            OnCommandDelete?.Invoke(null, customCommandToDelete);
+        }
 
         public static void AddCommand(CustomCommand customCommandToAdd)
         {
