@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using HachijouBot.Commands.Danbooru;
 using HachijouBot.Commands.ManageDatabase;
 using HachijouBot.Commands.MapInfo;
+using HachijouBot.Commands.Reminder;
 using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
 using System;
@@ -78,6 +79,8 @@ namespace HachijouBot.Commands
 
             AddCommand(new ManageDatabaseCommand());
 
+            AddCommand(new AddReminderCommand());
+
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.OnCommandDelete += RemoveCommand;
             CustomCommandDatabase.LoadCommands();
@@ -109,6 +112,7 @@ namespace HachijouBot.Commands
             Commands.Add(command);
 
             await Hachijou.AddSlashCommand(command);
+            Console.WriteLine($"Added new command : {command.Name}");
         }
     }
 }

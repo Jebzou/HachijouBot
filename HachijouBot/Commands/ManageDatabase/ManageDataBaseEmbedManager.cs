@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using HachijouBot.BooruManager;
+using HachijouBot.Commands.Reminder;
 using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
 using HachijouBot.Extensions;
@@ -36,7 +37,8 @@ namespace HachijouBot.Commands.ManageDatabase
                 BuildDataBaseComponent("Role commands", "roleCommand"),
                 BuildDataBaseComponent("Custom commands", "customCommand"),
                 BuildDataBaseComponent("Map infos", "mapInfos"),
-                BuildDataBaseComponent("Danbooru watchers", "danbooruWatchers")
+                BuildDataBaseComponent("Danbooru watchers", "danbooruWatchers"),
+                BuildDataBaseComponent("Reminders", "reminders"),
             };
 
             Hachijou.GetInstance().Client.SelectMenuExecuted += SelectMenuHandler;
@@ -89,6 +91,9 @@ namespace HachijouBot.Commands.ManageDatabase
                     break;
                 case "customCommand":
                     DataBase = new CustomCommandDatabase();
+                    break;
+                case "reminders":
+                    DataBase = new ReminderDatabase();
                     break;
             }
 

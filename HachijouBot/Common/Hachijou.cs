@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using HachijouBot.Commands;
+using HachijouBot.Commands.Reminder;
 using HachijouBot.Common;
 using HachijouBot.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,8 @@ namespace HachijouBot
         private BooruManager.BooruManager BooruManager { get; set; }
 
         private IConfiguration Configuration { get; set; }
+
+        private ReminderManager ReminderManager;
 
         public async Task Initialize()
         {
@@ -167,6 +170,10 @@ namespace HachijouBot
             LoadDanbooru();
 
             Console.WriteLine($"Done loading Danbooru");
+
+            Console.WriteLine($"Load reminders");
+            ReminderManager = new ReminderManager();
+            Console.WriteLine($"Done loading reminders");
 
             return Task.CompletedTask;
         }
