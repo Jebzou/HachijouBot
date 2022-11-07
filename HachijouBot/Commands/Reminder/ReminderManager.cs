@@ -14,6 +14,9 @@ namespace HachijouBot.Commands.Reminder
             timer.Elapsed += Timer_Elapsed;
             timer.AutoReset = true;
             timer.Enabled = true;
+
+
+            Hachijou.GetInstance().Client.ButtonExecuted += Client_ButtonExecuted;
         }
 
         private async void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
@@ -48,17 +51,47 @@ namespace HachijouBot.Commands.Reminder
 
         private async Task TriggerReminder(ReminderModel reminder)
         {
+            ComponentBuilder builder = new ComponentBuilder();
+
+            if (reminder.ReminderType != ReminderType.Once)
+            {
+                reminder.CancelButtonId = $"reminder-delete-button-{Guid.NewGuid()}";
+                builder.WithButton("Stop reminding me", style: ButtonStyle.Danger, customId: reminder.CancelButtonId);
+            }
+
+            MessageComponent cancelButton = builder.Build();
+
             if (reminder.ChannelId is ulong channelId)
             {
                 SocketUser user = Hachijou.GetInstance().Client.GetUser(reminder.UserId);
                 SocketTextChannel channel = (SocketTextChannel)Hachijou.GetInstance().Client.GetChannel(channelId);
-                await channel.SendMessageAsync($"{user.Mention} Reminder : {reminder.Message}");
+                await channel.SendMessageAsync($"{user.Mention} Reminder : {reminder.Message}", components: cancelButton);
             }
             else
             {
                 SocketUser user = Hachijou.GetInstance().Client.GetUser(reminder.UserId);
-                await user.SendMessageAsync($"Reminder : {reminder.Message}");
+                await user.SendMessageAsync($"Reminder : {reminder.Message}", components: cancelButton);
             }
+        }
+
+        private async Task Client_ButtonExecuted(SocketMessageComponent arg)
+        {
+            if (!arg.Data.CustomId.StartsWith("reminder-delete-button-")) return;
+
+            // get the reminder model
+            ReminderModel? reminder = ReminderDatabase.RemindersLoaded.Find(r => r.CancelButtonId == arg.Data.CustomId);
+
+            if (reminder is null) return;
+
+            if (reminder.UserId != arg.User.Id) return;
+
+            ReminderDatabase.DeleteReminder(reminder);
+
+            await arg.UpdateAsync(m =>
+            {
+                m.Content = $"{arg.Message}\n\r Reminder removed";
+                m.Components = null;
+            });
         }
     }
 }

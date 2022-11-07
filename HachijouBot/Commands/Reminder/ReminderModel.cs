@@ -16,5 +16,7 @@ namespace HachijouBot.Commands.Reminder
         public DateTime NextReminder { get; set; }
 
         public string Message { get; set; } = "";
+
+        public string CancelButtonId { get; set; } = "";
     }
 }
