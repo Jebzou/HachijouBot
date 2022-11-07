@@ -21,32 +21,40 @@ namespace HachijouBot.Commands.Reminder
 
         private async void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            foreach (ReminderModel reminder in ReminderDatabase.RemindersLoaded.ToList())
+            try
             {
-                if (reminder.NextReminder <= DateTime.UtcNow)
+                foreach (ReminderModel reminder in ReminderDatabase.RemindersLoaded.ToList())
                 {
-                    await TriggerReminder(reminder);
-
-                    switch (reminder.ReminderType)
+                    if (reminder.NextReminder <= DateTime.UtcNow)
                     {
-                        case ReminderType.Once:
-                            ReminderDatabase.DeleteReminder(reminder);
-                            break;
-                        case ReminderType.Daily:
-                            reminder.NextReminder = reminder.NextReminder.AddDays(1);
-                            break;
-                        case ReminderType.Weekly:
-                            reminder.NextReminder = reminder.NextReminder.AddDays(7);
-                            break;
-                        case ReminderType.Monthly:
-                            reminder.NextReminder = reminder.NextReminder.AddMonths(1);
-                            break;
+                        await TriggerReminder(reminder);
+
+                        switch (reminder.ReminderType)
+                        {
+                            case ReminderType.Once:
+                                ReminderDatabase.DeleteReminder(reminder);
+                                break;
+                            case ReminderType.Daily:
+                                reminder.NextReminder = reminder.NextReminder.AddDays(1);
+                                break;
+                            case ReminderType.Weekly:
+                                reminder.NextReminder = reminder.NextReminder.AddDays(7);
+                                break;
+                            case ReminderType.Monthly:
+                                reminder.NextReminder = reminder.NextReminder.AddMonths(1);
+                                break;
+                        }
+
+
                     }
 
-
                 }
-
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            
         }
 
         private async Task TriggerReminder(ReminderModel reminder)
