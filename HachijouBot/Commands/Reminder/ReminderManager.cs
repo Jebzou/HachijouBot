@@ -49,6 +49,8 @@ namespace HachijouBot.Commands.Reminder
                     }
 
                 }
+
+                ReminderDatabase.SaveChanges();
             }
             catch (Exception ex)
             {
