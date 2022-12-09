@@ -57,7 +57,7 @@ namespace HachijouBot.Commands.ManageDatabase
             if (arg.User.Id != UserId) return;
             if (!arg.User.IsAdmin((ulong)arg.GuildId)) return;
 
-            DanbooruWatcherChannelModel? channel = DanbooruImageWatcherDataBase.Watchers.FirstOrDefault(data => arg.ChannelId == ChannelId);
+            DanbooruWatcherChannelModel? channel = DanbooruImageWatcherDataBase.Watchers.FirstOrDefault(data => arg.ChannelId == data.ChannelId);
             if (channel is null) throw new Exception("No data for this channel");
             ChannelModel = channel;
 
