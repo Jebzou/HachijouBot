@@ -62,6 +62,7 @@ namespace HachijouBot.Commands
             Commands.Clear();
 
             AddCommand(new AddDanbooruWatcherCommand());
+            AddCommand(new ManageDanbooruWatcherCommand());
             AddCommand(new GetRandomPicture());
 
             AddCommand(new AddCommandCommand()); 

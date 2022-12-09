@@ -21,6 +21,24 @@ namespace HachijouBot.BooruManager
 
         public static event EventHandler<DanbooruWatcherChannelModel>? OnWatcherAdd;
 
+        public static void DeleteWatcherTag(DanbooruWatcherChannelModel watcherChannelModel, DanbooruWatcherTagModel watcherTagModel)
+        {
+            DanbooruWatcherChannelModel? channelWatcher = Watchers.Find(watcherPerChannel => watcherPerChannel.Id == watcherChannelModel.Id);
+            if (channelWatcher is null) return;
+
+            DanbooruWatcherTagModel? tagToDelete = channelWatcher.Tags.Find(tag => tag.Id == watcherTagModel.Id);
+            if (tagToDelete is null) return;
+
+            watcherChannelModel.Tags.Remove(watcherTagModel);
+
+            if (!watcherChannelModel.Tags.Any())
+            {
+                Watchers.Remove(watcherChannelModel);
+            }
+
+            SaveWatchers();
+        }
+
         public static void AddWatcher(DanbooruWatcherChannelModel watcher)
         {
             DanbooruWatcherChannelModel? channelWatcher = Watchers.Find(watcherPerChannel => watcherPerChannel.ChannelId == watcher.ChannelId);

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HachijouBot.Models;
 
 namespace HachijouBot.BooruManager.Models
 {
-    public class DanbooruWatcherChannelModel
+    public class DanbooruWatcherChannelModel : DatabaseModel
     {
         public ulong? ChannelId { get; set; } = null;
 
