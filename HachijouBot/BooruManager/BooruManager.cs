@@ -28,10 +28,17 @@ namespace HachijouBot.BooruManager
                     IMessageChannel channel = Hachijou.Client.GetChannel((ulong)watcherInfos.ChannelId) as IMessageChannel;
                     if (channel is null) continue;
 
-                    await CheckMissingPicsForAChannel(watcherInfos, channel);
-                }
+                    try
+                    {
+                        await CheckMissingPicsForAChannel(watcherInfos, channel);
 
-                DanbooruImageWatcherDataBase.SaveWatchers();
+                        DanbooruImageWatcherDataBase.SaveWatchers();
+                    }
+                    catch (Exception ex)
+                    {
+                        Hachijou.HandleError(ex);
+                    }
+                }
             }
             catch (Exception ex)
             {
