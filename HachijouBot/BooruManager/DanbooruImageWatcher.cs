@@ -1,5 +1,4 @@
-﻿using BooruDex.Booru.Client;
-using BooruDex.Models;
+﻿using BooruDex.Models;
 using HachijouBot.BooruManager.Models;
 
 namespace HachijouBot.BooruManager
@@ -16,7 +15,7 @@ namespace HachijouBot.BooruManager
 
         public async Task<List<string>> GetNewImagesAsync()
         {
-            var client = new DanbooruDonmai(new HttpClient());
+            var client = new HachijouDanbooru();
 
             Post[] posts = await client.PostListAsync(50, WatcherInfos.Tags.ToArray());
 
@@ -42,11 +41,12 @@ namespace HachijouBot.BooruManager
 
         public async Task<string> GetRandomImage()
         {
-            var client = new DanbooruDonmai(new HttpClient());
+            var client = new HachijouDanbooru();
 
-            Post post = await client.GetRandomPostAsync(WatcherInfos.Tags.ToArray());
+            throw new NotImplementedException("Todo");
+            //Post post = await client.GetRandomPostAsync(WatcherInfos.Tags.ToArray());
 
-            return post.PostUrl;
+            //return post.PostUrl;
         }
     }
 

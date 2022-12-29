@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using HachijouBot.BooruManager;
 using HachijouBot.Commands;
 using HachijouBot.Commands.Reminder;
 using HachijouBot.Common;
@@ -181,6 +182,8 @@ namespace HachijouBot
         private void LoadDanbooru()
         {
             BooruManager = new BooruManager.BooruManager(this);
+            HachijouDanbooru.Login = Configuration["DanbooruLogin"];
+            HachijouDanbooru.ApiKey = Configuration["DanbooruApiKey"];
             BooruManager.CheckMissingPics();
 
             System.Timers.Timer timer = new System.Timers.Timer(18e5);
