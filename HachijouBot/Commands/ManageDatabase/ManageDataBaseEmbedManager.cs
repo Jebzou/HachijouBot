@@ -7,6 +7,7 @@ using HachijouBot.Common;
 using HachijouBot.Extensions;
 using HachijouBot.Models;
 using System.Data;
+using HachijouBot.KancolleNews;
 
 namespace HachijouBot.Commands.ManageDatabase
 {
@@ -39,6 +40,7 @@ namespace HachijouBot.Commands.ManageDatabase
                 BuildDataBaseComponent("Map infos", "mapInfos"),
                 BuildDataBaseComponent("Danbooru watchers", "danbooruWatchers"),
                 BuildDataBaseComponent("Reminders", "reminders"),
+                BuildDataBaseComponent("Kancolle news subscriptions", "kancolleNews"),
             };
 
             Hachijou.GetInstance().Client.SelectMenuExecuted += SelectMenuHandler;
@@ -94,6 +96,9 @@ namespace HachijouBot.Commands.ManageDatabase
                     break;
                 case "reminders":
                     DataBase = new ReminderDatabase();
+                    break;
+                case "kancolleNews":
+                    DataBase = new KancolleNewsDatabase();
                     break;
             }
 

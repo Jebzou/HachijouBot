@@ -7,6 +7,7 @@ using HachijouBot.Common;
 using HachijouBot.Extensions;
 using Microsoft.Extensions.Configuration;
 using System.Timers;
+using HachijouBot.KancolleNews;
 
 namespace HachijouBot
 {
@@ -31,6 +32,8 @@ namespace HachijouBot
         private IConfiguration Configuration { get; set; }
 
         private ReminderManager ReminderManager;
+
+        public KancolleNewsService KancolleNewsService { get; private set; }
 
         public async Task Initialize()
         {
@@ -175,6 +178,10 @@ namespace HachijouBot
             Console.WriteLine($"Load reminders");
             ReminderManager = new ReminderManager();
             Console.WriteLine($"Done loading reminders");
+            
+            Console.WriteLine($"Load news service");
+            KancolleNewsService = new KancolleNewsService();
+            Console.WriteLine($"Done loading news service");
 
             return Task.CompletedTask;
         }

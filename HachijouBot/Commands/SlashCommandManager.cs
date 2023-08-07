@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HachijouBot.Commands.KancolleNews;
 
 namespace HachijouBot.Commands
 {
@@ -81,6 +82,8 @@ namespace HachijouBot.Commands
             AddCommand(new ManageDatabaseCommand());
 
             AddCommand(new AddReminderCommand());
+
+            AddCommand(new AddKancolleNewsSubscriptionCommand());
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.OnCommandDelete += RemoveCommand;
