@@ -17,6 +17,7 @@ namespace HachijouBot.KancolleNews
         public KancolleNewsService()
         {
             KancolleNewsDatabase.LoadSubscriptions();
+            CheckNews().Wait(30000);
 
             // Every 10 minutes
             System.Timers.Timer timer = new System.Timers.Timer(600000);
@@ -40,6 +41,8 @@ namespace HachijouBot.KancolleNews
             try
             {
                 await CheckNewsForOneChannel(subscription, commit);
+
+                subscription.LastUpdateCommitId = commit.CommitId;
             }
             catch (Exception ex)
             {
