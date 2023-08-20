@@ -34,12 +34,12 @@ namespace HachijouBot.KancolleNews
 
         public async Task CheckNews(KancolleNewsSubscriptionModel subscription)
         {
-            // Get last commit
-            GithubCommitModel? commit = await GithubCommitService.GetLatestCommit();
-            if (commit is null) return;
-            
             try
             {
+                // Get last commit
+                GithubCommitModel? commit = await GithubCommitService.GetLatestCommit();
+                if (commit is null) return;
+            
                 await CheckNewsForOneChannel(subscription, commit);
 
                 subscription.LastUpdateCommitId = commit.CommitId;
@@ -55,22 +55,29 @@ namespace HachijouBot.KancolleNews
         private async Task CheckNews()
         {
             // Get last commit
-            GithubCommitModel? commit = await GithubCommitService.GetLatestCommit();
-            if (commit is null) return;
-
-            // For each channel check last update and run update if needed
-            foreach (KancolleNewsSubscriptionModel subscription in KancolleNewsDatabase.SubscriptionsLoaded)
+            try
             {
-                try
-                {
-                    await CheckNewsForOneChannel(subscription, commit);
+                GithubCommitModel? commit = await GithubCommitService.GetLatestCommit();
+                if (commit is null) return;
 
-                    subscription.LastUpdateCommitId = commit.CommitId;
-                }
-                catch (Exception ex)
+                // For each channel check last update and run update if needed
+                foreach (KancolleNewsSubscriptionModel subscription in KancolleNewsDatabase.SubscriptionsLoaded)
                 {
-                    Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
+                    try
+                    {
+                        await CheckNewsForOneChannel(subscription, commit);
+
+                        subscription.LastUpdateCommitId = commit.CommitId;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
             }
 
             KancolleNewsDatabase.SaveSubscriptions();
