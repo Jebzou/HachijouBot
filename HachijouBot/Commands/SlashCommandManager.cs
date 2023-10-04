@@ -84,6 +84,7 @@ namespace HachijouBot.Commands
             AddCommand(new AddReminderCommand());
 
             AddCommand(new AddKancolleNewsSubscriptionCommand());
+            AddCommand(new RemoveKancolleNewsSubscriptionCommand());
 
             CustomCommandDatabase.OnCommandAdd += (_, command) => AddCommand(command);
             CustomCommandDatabase.OnCommandDelete += RemoveCommand;

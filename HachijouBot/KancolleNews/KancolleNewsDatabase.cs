@@ -16,6 +16,12 @@ namespace HachijouBot.KancolleNews
             SaveSubscriptions();
         }
 
+        public static void RemoveSubscription(KancolleNewsSubscriptionModel subscriptionToRemove)
+        {
+            SubscriptionsLoaded.Remove(subscriptionToRemove);
+            SaveSubscriptions();
+        }
+
         public static void LoadSubscriptions()
         {
             SubscriptionsLoaded.Clear();
