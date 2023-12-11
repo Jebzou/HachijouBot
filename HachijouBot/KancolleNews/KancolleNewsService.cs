@@ -143,6 +143,10 @@ namespace HachijouBot.KancolleNews
             {
                 await PostUpdateMaintenanceInformation(subscription, lastNewUpdate, true);
             }
+            else
+            {
+                return;
+            }
 
             if (lastOldUpdate.EndTweetLink != lastNewUpdate.EndTweetLink) await PostMessage(subscription, $"{lastNewUpdate.EndTweetLink}");
             else if (lastOldUpdate.StartTweetLink != lastNewUpdate.StartTweetLink) await PostMessage(subscription, $"{lastNewUpdate.StartTweetLink}");
