@@ -93,7 +93,9 @@ namespace HachijouBot.KancolleNews
 
 
             EoUpdateModel? lastNewUpdate = newUpdateModel
-                .Where(upd => upd.WasLiveUpdate is false)
+                .Where(upd => !upd.WasLiveUpdate)
+                .Where(upd => upd.UpdateDate is not null)
+                .Where(upd => upd.UpdateStartTime is not null)
                 .Where(upd => upd.UpdateIsComing() || upd.UpdateInProgress())
                 .MaxBy(upd => upd.UpdateDate);
 
@@ -116,7 +118,9 @@ namespace HachijouBot.KancolleNews
             List<EoUpdateModel> oldUpdateModel = await EoUpdateService.GetUpdates(subscription.LastUpdateCommitId);
 
             EoUpdateModel? lastOldUpdate = oldUpdateModel
-                .Where(upd => upd.WasLiveUpdate is false)
+                .Where(upd => !upd.WasLiveUpdate)
+                .Where(upd => upd.UpdateDate is not null)
+                .Where(upd => upd.UpdateStartTime is not null)
                 .Where(upd => upd.UpdateDate <= lastNewUpdate.UpdateDate)
                 .MaxBy(upd => upd.UpdateDate);
 
@@ -170,12 +174,12 @@ namespace HachijouBot.KancolleNews
 
         private string NewMaintenanceEndDiscordTimeStamp(EoUpdateModel newUpdateModel, bool isDelay)
         {
-            if (newUpdateModel.UpdateEndTime is not { } updateEnd) return "";
+            if (newUpdateModel is not { UpdateDate: {} updateStart, UpdateEndTime: {} updateEnd}) return "";
 
             // Times are in JST, need to convert back to UTC
             TimeZoneInfo japaneseTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
 
-            DateTime end = newUpdateModel.UpdateDate.Add(updateEnd);
+            DateTime end = updateStart.Add(updateEnd);
             DateTimeOffset endUtcTime = TimeZoneInfo.ConvertTimeToUtc(end, japaneseTimeZone);
 
             return isDelay switch
@@ -189,10 +193,12 @@ namespace HachijouBot.KancolleNews
 
         private string NewMaintenanceDiscordTimeStamp(EoUpdateModel newUpdateModel)
         {
+            if (newUpdateModel is not { UpdateDate: { } updateStart, UpdateStartTime: { } updateStartTime}) return "";
+
             StringBuilder timestamp = new StringBuilder();
 
             // Times are in JST, need to convert back to UTC
-            DateTime start = newUpdateModel.UpdateDate.Add(newUpdateModel.UpdateStartTime);
+            DateTime start = updateStart.Add(updateStartTime);
             TimeZoneInfo japaneseTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
             DateTimeOffset startUtcTime = TimeZoneInfo.ConvertTimeToUtc(start, japaneseTimeZone);
 
@@ -200,7 +206,7 @@ namespace HachijouBot.KancolleNews
 
             if (newUpdateModel.UpdateEndTime is { } updateEnd)
             {
-                DateTime end = newUpdateModel.UpdateDate.Add(updateEnd);
+                DateTime end = updateStart.Add(updateEnd);
                 DateTimeOffset endUtcTime = TimeZoneInfo.ConvertTimeToUtc(end, japaneseTimeZone);
 
                 timestamp.AppendLine($"Next maintenance should end on <t:{endUtcTime.ToUnixTimeSeconds()}:F> (<t:{endUtcTime.ToUnixTimeSeconds()}:R>)");
