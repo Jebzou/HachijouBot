@@ -1,5 +1,4 @@
-﻿using HachijouBot.Common;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace HachijouBot.KancolleNews;
 
@@ -13,7 +12,6 @@ public class EoUpdateModel
     public int Id { get; set; }
 
     [JsonPropertyName("start_date")]
-    [JsonConverter(typeof(NullableDateConverter))]
     public DateTime? UpdateDate { get; set; }
 
     [JsonPropertyName("start_time")]

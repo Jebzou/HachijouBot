@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+﻿using System.Text.Json;
 
 namespace HachijouBot.KancolleNews
 {
@@ -26,9 +26,19 @@ namespace HachijouBot.KancolleNews
         {
             if (EoUpdateCache.TryGetValue(commitId, out List<EoUpdateModel>? updatesFound)) return updatesFound;
 
-            List<EoUpdateModel>? updates = await HttpClient.GetFromJsonAsync<List<EoUpdateModel>?>(string.Format(FetchUrl, commitId));
+            string content = await HttpClient.GetStringAsync(string.Format(FetchUrl, commitId));
 
-            return updates ?? new List<EoUpdateModel>();
+            try
+            {
+                List<EoUpdateModel>? updates = JsonSerializer.Deserialize<List<EoUpdateModel>>(content);
+
+                return updates ?? new List<EoUpdateModel>();
+            }
+            catch
+            {
+                Console.WriteLine(content);
+                throw;
+            }
         }
     }
 }
