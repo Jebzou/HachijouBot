@@ -6,7 +6,6 @@ namespace HachijouBot.KancolleNews;
 /// <summary>
 /// Kancolle update model (From Eo tools)
 /// </summary>
-[JsonConverter(typeof(NullableDateConverter))]
 public class EoUpdateModel
 {
 
@@ -14,6 +13,7 @@ public class EoUpdateModel
     public int Id { get; set; }
 
     [JsonPropertyName("start_date")]
+    [JsonConverter(typeof(NullableDateConverter))]
     public DateTime? UpdateDate { get; set; }
 
     [JsonPropertyName("start_time")]
