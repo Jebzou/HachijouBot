@@ -1,10 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using HachijouBot.Common;
+using System.Text.Json.Serialization;
 
 namespace HachijouBot.KancolleNews;
 
 /// <summary>
 /// Kancolle update model (From Eo tools)
 /// </summary>
+[JsonConverter(typeof(NullableDateConverter))]
 public class EoUpdateModel
 {
 
