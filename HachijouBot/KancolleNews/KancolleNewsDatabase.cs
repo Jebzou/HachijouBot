@@ -6,7 +6,7 @@ namespace HachijouBot.KancolleNews
 {
     public class KancolleNewsDatabase : IDataBase
     {
-        private const string Path = "KancolleNews.json";
+        private const string Path = "data/KancolleNews.json";
 
         public static List<KancolleNewsSubscriptionModel> SubscriptionsLoaded = new List<KancolleNewsSubscriptionModel>();
         

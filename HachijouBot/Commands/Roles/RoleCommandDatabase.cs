@@ -6,7 +6,7 @@ namespace HachijouBot.Commands.Roles
 {
     public class RoleCommandDatabase : IDataBase
     {
-        private const string CommandPath = "RoleCommands.json";
+        private const string CommandPath = "data/RoleCommands.json";
 
         public static List<RoleCommand> CommandsLoaded = new List<RoleCommand>();
 

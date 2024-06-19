@@ -49,7 +49,7 @@ namespace HachijouBot
 
             //Create the configuration
             var _builder = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
+                .SetBasePath(AppContext.BaseDirectory + "/data")
                 .AddJsonFile(path: "config.json");
 
             Configuration = _builder.Build();

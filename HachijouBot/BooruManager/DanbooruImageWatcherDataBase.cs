@@ -1,21 +1,14 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using HachijouBot.BooruManager.Models;
 using HachijouBot.Common;
 using HachijouBot.Models;
-using Microsoft.Extensions.FileSystemGlobbing;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HachijouBot.BooruManager
 {
     public class DanbooruImageWatcherDataBase : IDataBase
     {
-        private const string Path = "DanbooruWatchers.json";
+        private const string Path = "data/DanbooruWatchers.json";
 
         public static List<DanbooruWatcherChannelModel> Watchers = new List<DanbooruWatcherChannelModel>();
 

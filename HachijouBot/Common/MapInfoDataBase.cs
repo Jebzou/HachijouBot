@@ -6,7 +6,7 @@ namespace HachijouBot.Common
 {
     public class MapInfoDatabase : IDataBase
     {
-        private const string Path = "MapInfo.json";
+        private const string Path = "data/MapInfo.json";
 
         public static List<MapInfoModel> MapsLoaded = new List<MapInfoModel>();
 

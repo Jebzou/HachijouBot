@@ -7,7 +7,7 @@ namespace HachijouBot.Common
 {
     public class CustomCommandDatabase : IDataBase
     {
-        private const string CommandPath = "CustomCommands.json";
+        private const string CommandPath = "data/CustomCommands.json";
 
         public static List<CustomCommand> CommandsLoaded = new List<CustomCommand>();
 

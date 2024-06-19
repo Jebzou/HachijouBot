@@ -7,7 +7,7 @@ namespace HachijouBot.Commands.Reminder
 {
     public class ReminderDatabase : IDataBase
     {
-        private const string CommandPath = "Reminders.json";
+        private const string CommandPath = "data/Reminders.json";
 
         public static List<ReminderModel> RemindersLoaded = new List<ReminderModel>();
 
@@ -17,7 +17,7 @@ namespace HachijouBot.Commands.Reminder
 
             if (!deleted)
             {
-                throw new Exception("Remidner not found");
+                throw new Exception("Reminder not found");
             }
 
             SaveChanges();
