@@ -7,6 +7,7 @@ using HachijouBot.Common;
 using HachijouBot.Extensions;
 using Microsoft.Extensions.Configuration;
 using System.Timers;
+using HachijouBot.ElectronicObserverReport;
 using HachijouBot.KancolleNews;
 
 namespace HachijouBot
@@ -34,6 +35,9 @@ namespace HachijouBot
         private ReminderManager ReminderManager;
 
         public KancolleNewsService KancolleNewsService { get; private set; }
+
+        public ElectronicObserverReportService ElectronicObserverReportService { get; private set; }
+        public ElectronicObserverApiService ElectronicObserverApiService { get; private set; }
 
         public async Task Initialize()
         {
@@ -161,7 +165,7 @@ namespace HachijouBot
         private Task Ready()
         {
             Console.WriteLine($"Connected");
-
+            /*
             LoadEmotes();
 
             CustomCommandManager = new SlashCommandManager(this);
@@ -182,8 +186,21 @@ namespace HachijouBot
             Console.WriteLine($"Load news service");
             KancolleNewsService = new KancolleNewsService();
             Console.WriteLine($"Done loading news service");
+            */
+            LoadEoReportService();
 
             return Task.CompletedTask;
+        }
+
+        private void LoadEoReportService()
+        {
+            if (string.IsNullOrEmpty(Configuration["EoApiUrl"])) return;
+
+            Console.WriteLine("Load EO issue report service");
+            ElectronicObserverApiService = new(Configuration["EoApiUrl"], Configuration["EoApiSecret"]);
+            EoDataService data = new EoDataService();
+            ElectronicObserverReportService = new(ElectronicObserverApiService, Configuration["ReportChannelId"], data);
+            Console.WriteLine("Done loading EO issue report service");
         }
 
         private void LoadDanbooru()
