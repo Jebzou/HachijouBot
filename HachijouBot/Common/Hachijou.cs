@@ -165,7 +165,7 @@ namespace HachijouBot
         private Task Ready()
         {
             Console.WriteLine($"Connected");
-            /*
+            
             LoadEmotes();
 
             CustomCommandManager = new SlashCommandManager(this);
@@ -186,7 +186,7 @@ namespace HachijouBot
             Console.WriteLine($"Load news service");
             KancolleNewsService = new KancolleNewsService();
             Console.WriteLine($"Done loading news service");
-            */
+            
             LoadEoReportService();
 
             return Task.CompletedTask;
