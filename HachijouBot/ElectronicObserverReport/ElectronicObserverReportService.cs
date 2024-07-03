@@ -78,6 +78,8 @@ public class ElectronicObserverReportService
         }
 
         await PostMessage(message.ToString());
+
+        LastId = issues.Max(issue => issue.Id);
     }
 
     private async Task ParseIssues(EquipmentUpgradeIssueModel issue, StringBuilder message)
