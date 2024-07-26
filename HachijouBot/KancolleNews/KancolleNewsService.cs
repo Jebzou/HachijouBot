@@ -177,10 +177,8 @@ namespace HachijouBot.KancolleNews
             if (newUpdateModel is not { UpdateDate: {} updateStart, UpdateEndTime: {} updateEnd}) return "";
 
             // Times are in JST, need to convert back to UTC
-            TimeZoneInfo japaneseTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
-
-            DateTime end = updateStart.Add(updateEnd);
-            DateTimeOffset endUtcTime = TimeZoneInfo.ConvertTimeToUtc(end, japaneseTimeZone);
+            DateTimeOffset end = updateStart.Add(updateEnd);
+            DateTimeOffset endUtcTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(end, "Tokyo Standard Time");
 
             return isDelay switch
             {
@@ -198,16 +196,15 @@ namespace HachijouBot.KancolleNews
             StringBuilder timestamp = new StringBuilder();
 
             // Times are in JST, need to convert back to UTC
-            DateTime start = updateStart.Add(updateStartTime);
-            TimeZoneInfo japaneseTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
-            DateTimeOffset startUtcTime = TimeZoneInfo.ConvertTimeToUtc(start, japaneseTimeZone);
+            DateTimeOffset start = updateStart.Add(updateStartTime);
+            DateTimeOffset startUtcTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(start, "Tokyo Standard Time");
 
             timestamp.AppendLine($"Next maintenance starts on <t:{startUtcTime.ToUnixTimeSeconds()}:F> (<t:{startUtcTime.ToUnixTimeSeconds()}:R>)");
 
             if (newUpdateModel.UpdateEndTime is { } updateEnd)
             {
-                DateTime end = updateStart.Add(updateEnd);
-                DateTimeOffset endUtcTime = TimeZoneInfo.ConvertTimeToUtc(end, japaneseTimeZone);
+                DateTimeOffset end = updateStart.Add(updateEnd);
+                DateTimeOffset endUtcTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(end, "Tokyo Standard Time");
 
                 timestamp.AppendLine($"Next maintenance should end on <t:{endUtcTime.ToUnixTimeSeconds()}:F> (<t:{endUtcTime.ToUnixTimeSeconds()}:R>)");
             }
