@@ -12,7 +12,7 @@ public class EoUpdateModel
     public int Id { get; set; }
 
     [JsonPropertyName("start_date")]
-    public DateTimeOffset? UpdateDate { get; set; }
+    public DateTime? UpdateDate { get; set; }
 
     [JsonPropertyName("start_time")]
     public TimeSpan? UpdateStartTime { get; set; } = TimeSpan.Zero;
