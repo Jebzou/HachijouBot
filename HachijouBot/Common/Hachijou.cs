@@ -36,7 +36,7 @@ namespace HachijouBot
 
         public KancolleNewsService KancolleNewsService { get; private set; }
 
-        public ElectronicObserverReportService ElectronicObserverReportService { get; private set; }
+        public ElectronicObserverReportService? ElectronicObserverReportService { get; private set; }
         public ElectronicObserverApiService ElectronicObserverApiService { get; private set; }
 
         public async Task Initialize()
@@ -195,6 +195,7 @@ namespace HachijouBot
         private void LoadEoReportService()
         {
             if (string.IsNullOrEmpty(Configuration["EoApiUrl"])) return;
+            if (ElectronicObserverReportService is not null) return;
 
             Console.WriteLine("Load EO issue report service");
             ElectronicObserverApiService = new(Configuration["EoApiUrl"], Configuration["EoApiSecret"]);
