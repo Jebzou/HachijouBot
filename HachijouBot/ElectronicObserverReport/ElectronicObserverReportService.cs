@@ -11,7 +11,8 @@ public class ElectronicObserverReportService
 {
     private ElectronicObserverApiService ElectronicObserverApiService { get; set; }
 
-    private int LastId { get; set; }
+    private int UpgradeIssueLastId { get; set; }
+    private int UpgradeCostIssueLastId { get; set; }
 
     private string ReportChannelId { get; }
 
@@ -42,18 +43,30 @@ public class ElectronicObserverReportService
     {
         try
         {
-            if (LastId == 0)
+            if (UpgradeIssueLastId == 0)
             {
-                string url = $"EquipmentUpgradeIssues/latest";
+                string url = "EquipmentUpgradeIssues/latest";
                 List<EquipmentUpgradeIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeIssueModel>>(url);
 
                 if (issues is { Count: > 0 } issuesNotNull)
                 {
-                    LastId = issuesNotNull[0].Id;
+                    UpgradeIssueLastId = issuesNotNull[0].Id;
                 }
             }
 
+            /*if (UpgradeCostIssueLastId == 0)
+            {
+                string url = "EquipmentUpgradeCostIssues/latest";
+                List<EquipmentUpgradeCostIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeCostIssueModel>>(url);
+
+                if (issues is { Count: > 0 } issuesNotNull)
+                {
+                    UpgradeCostIssueLastId = issuesNotNull[0].Id;
+                }
+            }*/
+
             await CheckUpgradeIssues();
+            await CheckUpgradeCostIssues();
         }
         catch (Exception ex)
         {
@@ -63,7 +76,7 @@ public class ElectronicObserverReportService
 
     private async Task CheckUpgradeIssues()
     {
-        string url = $"EquipmentUpgradeIssues?startId={LastId}";
+        string url = $"EquipmentUpgradeIssues?startId={UpgradeIssueLastId}";
         List<EquipmentUpgradeIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeIssueModel>>(url);
         
         if (issues is null) return;
@@ -79,7 +92,57 @@ public class ElectronicObserverReportService
 
         await PostMessage(message.ToString());
 
-        LastId = issues.Max(issue => issue.Id);
+        UpgradeIssueLastId = issues.Max(issue => issue.Id);
+    }
+
+    private async Task CheckUpgradeCostIssues()
+    {
+        string url = $"EquipmentUpgradeCostIssues?startId={UpgradeCostIssueLastId}";
+        List<EquipmentUpgradeCostIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeCostIssueModel>>(url);
+
+        if (issues is null) return;
+        if (!issues.Any()) return;
+
+        StringBuilder message = new();
+        message.AppendLine("Detected upgrade cost issues : ");
+
+        foreach (EquipmentUpgradeCostIssueModel issue in issues)
+        {
+            await ParseIssues(issue, message);
+        }
+
+        await PostMessage(message.ToString());
+
+        UpgradeCostIssueLastId = issues.Max(issue => issue.Id);
+    }
+
+    private async Task ParseIssues(EquipmentUpgradeCostIssueModel issue, StringBuilder message)
+    {
+        ShipModel shipModel = await EoDataService.GetShip(issue.HelperId) ?? new();
+        EquipmentModel eq = await EoDataService.GetEquipment(issue.EquipmentId) ?? new();
+
+        string upgradeStage = issue.UpgradeStage switch
+        {
+            UpgradeStage.From0To5 => "0\uff5e5",
+            UpgradeStage.From6To9 => "6\uff5e9",
+            _ => issue.UpgradeStage.ToString(),
+        };
+
+        message.AppendLine($"## {eq.NameEN} with {shipModel.NameEN} ({upgradeStage})");
+        message.AppendLine($"- {issue.Actual.Fuel} {EmoteDataBase.Emotes["kcfuel"]} {issue.Actual.Ammo} {EmoteDataBase.Emotes["kcammo"]} {issue.Actual.Steel} {EmoteDataBase.Emotes["kcsteel"]} {issue.Actual.Bauxite} {EmoteDataBase.Emotes["kcbauxite"]}");
+
+        foreach (EquipmentUpgradeCostItemModel consumedEquipmentReq in issue.Actual.EquipmentDetail)
+        {
+            EquipmentModel requiredEquipment = await EoDataService.GetEquipment(consumedEquipmentReq.Id) ?? new();
+
+            message.AppendLine($"- {requiredEquipment.NameEN} x{consumedEquipmentReq.Count}");
+        }
+
+        foreach (EquipmentUpgradeCostItemModel consumedItemId in issue.Actual.ConsumableDetail)
+        {
+            UseItemId useItem = (UseItemId)consumedItemId.Id;
+            message.AppendLine($"- {useItem} x{consumedItemId.Count}");
+        }
     }
 
     private async Task ParseIssues(EquipmentUpgradeIssueModel issue, StringBuilder message)
