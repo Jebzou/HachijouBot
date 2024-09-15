@@ -168,7 +168,7 @@ namespace HachijouBot
             
             LoadEmotes();
 
-            //CustomCommandManager = new SlashCommandManager(this);
+            CustomCommandManager = new SlashCommandManager(this);
             Client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
 
             Console.WriteLine($"Done loading Discord");
