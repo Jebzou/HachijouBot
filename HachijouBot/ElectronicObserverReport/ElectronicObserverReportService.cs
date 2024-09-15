@@ -54,7 +54,7 @@ public class ElectronicObserverReportService
                 }
             }
 
-            /*if (UpgradeCostIssueLastId == 0)
+            if (UpgradeCostIssueLastId == 0)
             {
                 string url = "EquipmentUpgradeCostIssues/latest";
                 List<EquipmentUpgradeCostIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeCostIssueModel>>(url);
@@ -63,7 +63,7 @@ public class ElectronicObserverReportService
                 {
                     UpgradeCostIssueLastId = issuesNotNull[0].Id;
                 }
-            }*/
+            }
 
             await CheckUpgradeIssues();
             await CheckUpgradeCostIssues();

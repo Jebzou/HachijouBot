@@ -169,22 +169,22 @@ namespace HachijouBot
             LoadEmotes();
 
             //CustomCommandManager = new SlashCommandManager(this);
-            //Client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
+            Client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
 
             Console.WriteLine($"Done loading Discord");
 
             // Load danbooru
             Console.WriteLine($"Loading Danbooru");
-            //LoadDanbooru();
+            LoadDanbooru();
 
             Console.WriteLine($"Done loading Danbooru");
 
             Console.WriteLine($"Load reminders");
-            //ReminderManager = new ReminderManager();
+            ReminderManager = new ReminderManager();
             Console.WriteLine($"Done loading reminders");
             
             Console.WriteLine($"Load news service");
-            //KancolleNewsService = new KancolleNewsService();
+            KancolleNewsService = new KancolleNewsService();
             Console.WriteLine($"Done loading news service");
             
             LoadEoReportService();
