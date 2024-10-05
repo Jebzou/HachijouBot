@@ -118,7 +118,7 @@ public class ElectronicObserverReportService
 
     private async Task ParseIssues(EquipmentUpgradeCostIssueModel issue, StringBuilder message)
     {
-        ShipModel shipModel = await EoDataService.GetShip(issue.HelperId) ?? new();
+        ShipModel? shipModel = await EoDataService.GetShip(issue.HelperId);
         EquipmentModel eq = await EoDataService.GetEquipment(issue.EquipmentId) ?? new();
 
         string upgradeStage = issue.UpgradeStage switch
@@ -128,8 +128,9 @@ public class ElectronicObserverReportService
             _ => issue.UpgradeStage.ToString(),
         };
 
-        message.AppendLine($"## {eq.NameEN} with {shipModel.NameEN} ({upgradeStage})");
-        message.AppendLine($"- {issue.Actual.Fuel} {EmoteDataBase.Emotes["kcfuel"]} {issue.Actual.Ammo} {EmoteDataBase.Emotes["kcammo"]} {issue.Actual.Steel} {EmoteDataBase.Emotes["kcsteel"]} {issue.Actual.Bauxite} {EmoteDataBase.Emotes["kcbauxite"]}");
+        message.AppendLine($"## {eq.NameEN} with {shipModel?.NameEN ?? $"#{issue.HelperId}"} ({upgradeStage})");
+        message.AppendLine($"- {issue.Actual.Fuel} {EmoteDataBase.Fuel} {issue.Actual.Ammo} {EmoteDataBase.Ammo} {issue.Actual.Steel} {EmoteDataBase.Steel} {issue.Actual.Bauxite} {EmoteDataBase.Bauxite}");
+        message.AppendLine($"- {issue.Actual.DevmatCost} {EmoteDataBase.DevMats} (slider: {issue.Actual.SliderDevmatCost} {EmoteDataBase.DevMats}) {issue.Actual.ImproveMatCost} {EmoteDataBase.Screws} (slider: {issue.Actual.SliderImproveMatCost} {EmoteDataBase.Screws})");
 
         foreach (EquipmentUpgradeCostItemModel consumedEquipmentReq in issue.Actual.EquipmentDetail)
         {
@@ -154,7 +155,7 @@ public class ElectronicObserverReportService
                 ShipModel shipModel = await EoDataService.GetShip(issue.HelperId) ?? new();
                 EquipmentModel eq = await EoDataService.GetEquipment(actualEquipmentId) ?? new();
 
-                message.AppendLine($"{shipModel.NameEN} ({shipModel.ApiId}) is missing an upgrade : {eq.NameEN} ({Enum.GetName(issue.Day)})");
+                message.AppendLine($"{shipModel.NameEN} ({issue.HelperId}) is missing an upgrade : {eq.NameEN} ({Enum.GetName(issue.Day)})");
             }
         }
 
@@ -165,7 +166,7 @@ public class ElectronicObserverReportService
                 ShipModel shipModel = await EoDataService.GetShip(issue.HelperId) ?? new();
                 EquipmentModel eq = await EoDataService.GetEquipment(expectedEquipmentId) ?? new();
 
-                message.AppendLine($"{shipModel.NameEN} ({shipModel.ApiId}) can't upgrade : {eq.NameEN} ({Enum.GetName(issue.Day)})");
+                message.AppendLine($"{shipModel.NameEN} ({issue.HelperId}) can't upgrade : {eq.NameEN} ({Enum.GetName(issue.Day)})");
             }
         }
     }

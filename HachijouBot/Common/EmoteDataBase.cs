@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HachijouBot.Common
+﻿namespace HachijouBot.Common
 {
     public static class EmoteDataBase
     {
-        public static Dictionary<string, string> Emotes = new Dictionary<string, string>()
+        public static Dictionary<string, string> Emotes { get; } = new()
         {
             { "kcfuel", "" },
             { "kcammo", "" },
             { "kcsteel", "" },
             { "kcbauxite", "" },
+            { "Screw", "" },
+            { "DevMats", "" },
         };
+
+        public static string DevMats => Emotes["DevMats"];
+        public static string Screws => Emotes["Screw"];
+        public static string Fuel => Emotes["kcfuel"];
+        public static string Ammo => Emotes["kcammo"];
+        public static string Steel => Emotes["kcsteel"];
+        public static string Bauxite => Emotes["kcbauxite"];
     }
 }
