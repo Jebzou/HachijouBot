@@ -200,7 +200,7 @@ namespace HachijouBot
             Console.WriteLine("Load EO issue report service");
             ElectronicObserverApiService = new(Configuration["EoApiUrl"], Configuration["EoApiSecret"]);
             EoDataService data = new EoDataService();
-            ElectronicObserverReportService = new(ElectronicObserverApiService, Configuration["ReportChannelId"], data);
+            ElectronicObserverReportService = new(ElectronicObserverApiService, Configuration, data);
             Console.WriteLine("Done loading EO issue report service");
         }
 

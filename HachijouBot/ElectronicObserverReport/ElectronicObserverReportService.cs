@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Text;
+using System.Text.Json;
 using Discord;
 using HachijouBot.Common;
 using HachijouBot.KancolleNews;
 using HachijouBot.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace HachijouBot.ElectronicObserverReport;
 
@@ -11,19 +13,21 @@ public class ElectronicObserverReportService
 {
     private ElectronicObserverApiService ElectronicObserverApiService { get; set; }
 
-    private int UpgradeIssueLastId { get; set; }
-    private int UpgradeCostIssueLastId { get; set; }
+    private ElectronicOberverReportConfigModel? LatestModel { get; set; }
 
     private string ReportChannelId { get; }
 
     private EoDataService EoDataService { get; }
+    private IConfiguration Config { get; }
 
-    public ElectronicObserverReportService(ElectronicObserverApiService api, string reportChannelId, EoDataService dataService)
+    public ElectronicObserverReportService(ElectronicObserverApiService api, IConfiguration configuration, EoDataService dataService)
     {
-        ElectronicObserverApiService = api;
-        ReportChannelId = reportChannelId;
-        EoDataService = dataService;
+        Config = configuration;
 
+        ElectronicObserverApiService = api;
+        ReportChannelId = Config["ReportChannelId"] ?? "";
+        EoDataService = dataService;
+        
         CheckIssues().Wait(30000);
 
         // Every 10 minutes
@@ -43,30 +47,38 @@ public class ElectronicObserverReportService
     {
         try
         {
-            if (UpgradeIssueLastId == 0)
+            if (LatestModel is null)
             {
+                LatestModel = JsonSerializer.Deserialize<ElectronicOberverReportConfigModel>(await File.ReadAllTextAsync("data/EoReportConfig.json")) ?? new();
+            }
+
+            if (LatestModel.UpgradeIssueLastId == 0)
+            {
+
                 string url = "EquipmentUpgradeIssues/latest";
                 List<EquipmentUpgradeIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeIssueModel>>(url);
 
                 if (issues is { Count: > 0 } issuesNotNull)
                 {
-                    UpgradeIssueLastId = issuesNotNull[0].Id;
+                    LatestModel.UpgradeIssueLastId = issuesNotNull[0].Id;
                 }
             }
 
-            if (UpgradeCostIssueLastId == 0)
+            if (LatestModel.UpgradeCostIssueLastId == 0)
             {
                 string url = "EquipmentUpgradeCostIssues/latest";
                 List<EquipmentUpgradeCostIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeCostIssueModel>>(url);
 
                 if (issues is { Count: > 0 } issuesNotNull)
                 {
-                    UpgradeCostIssueLastId = issuesNotNull[0].Id;
+                    LatestModel.UpgradeCostIssueLastId = issuesNotNull[0].Id;
                 }
             }
 
             await CheckUpgradeIssues();
             await CheckUpgradeCostIssues();
+
+            await UpdateConfig();
         }
         catch (Exception ex)
         {
@@ -76,7 +88,9 @@ public class ElectronicObserverReportService
 
     private async Task CheckUpgradeIssues()
     {
-        string url = $"EquipmentUpgradeIssues?startId={UpgradeIssueLastId}";
+        if (LatestModel is null) return;
+
+        string url = $"EquipmentUpgradeIssues?startId={LatestModel.UpgradeIssueLastId}";
         List<EquipmentUpgradeIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeIssueModel>>(url);
         
         if (issues is null) return;
@@ -88,16 +102,27 @@ public class ElectronicObserverReportService
         foreach (EquipmentUpgradeIssueModel issue in issues)
         {
             await ParseIssues(issue, message);
+
+            if (message.Length > 1000)
+            {
+                await PostMessage(message.ToString());
+                message.Clear();
+            }
         }
 
-        await PostMessage(message.ToString());
+        if (message.Length > 0)
+        {
+            await PostMessage(message.ToString());
+        }
 
-        UpgradeIssueLastId = issues.Max(issue => issue.Id);
+        LatestModel.UpgradeIssueLastId = issues.Max(issue => issue.Id);
     }
 
     private async Task CheckUpgradeCostIssues()
     {
-        string url = $"EquipmentUpgradeCostIssues?startId={UpgradeCostIssueLastId}";
+        if (LatestModel is null) return;
+
+        string url = $"EquipmentUpgradeCostIssues?startId={LatestModel.UpgradeCostIssueLastId}";
         List<EquipmentUpgradeCostIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeCostIssueModel>>(url);
 
         if (issues is null) return;
@@ -109,11 +134,25 @@ public class ElectronicObserverReportService
         foreach (EquipmentUpgradeCostIssueModel issue in issues)
         {
             await ParseIssues(issue, message);
+
+            if (message.Length > 1000)
+            {
+                await PostMessage(message.ToString());
+                message.Clear();
+            }
         }
 
-        await PostMessage(message.ToString());
+        if (message.Length > 0)
+        {
+            await PostMessage(message.ToString());
+        }
 
-        UpgradeCostIssueLastId = issues.Max(issue => issue.Id);
+        LatestModel.UpgradeCostIssueLastId = issues.Max(issue => issue.Id);
+    }
+
+    private async Task UpdateConfig()
+    {
+        await File.WriteAllTextAsync("data/EoReportConfig.json", JsonSerializer.Serialize(LatestModel));
     }
 
     private async Task ParseIssues(EquipmentUpgradeCostIssueModel issue, StringBuilder message)
