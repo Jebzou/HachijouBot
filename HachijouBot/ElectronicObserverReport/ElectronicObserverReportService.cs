@@ -20,6 +20,8 @@ public class ElectronicObserverReportService
     private EoDataService EoDataService { get; }
     private IConfiguration Config { get; }
 
+    private GetDataVersionService GetDataVersionService { get; }
+
     public ElectronicObserverReportService(ElectronicObserverApiService api, IConfiguration configuration, EoDataService dataService)
     {
         Config = configuration;
@@ -27,7 +29,8 @@ public class ElectronicObserverReportService
         ElectronicObserverApiService = api;
         ReportChannelId = Config["ReportChannelId"] ?? "";
         EoDataService = dataService;
-        
+        GetDataVersionService = new();
+
         CheckIssues().Wait(30000);
 
         // Every 10 minutes
@@ -49,7 +52,14 @@ public class ElectronicObserverReportService
         {
             if (LatestModel is null)
             {
-                LatestModel = JsonSerializer.Deserialize<ElectronicOberverReportConfigModel>(await File.ReadAllTextAsync("data/EoReportConfig.json")) ?? new();
+                if (File.Exists("data/EoReportConfig.json"))
+                {
+                    LatestModel = JsonSerializer.Deserialize<ElectronicOberverReportConfigModel>(await File.ReadAllTextAsync("data/EoReportConfig.json")) ?? new();
+                }
+                else
+                {
+                    LatestModel = new();
+                }
             }
 
             if (LatestModel.UpgradeIssueLastId == 0)
@@ -90,7 +100,9 @@ public class ElectronicObserverReportService
     {
         if (LatestModel is null) return;
 
-        string url = $"EquipmentUpgradeIssues?startId={LatestModel.UpgradeIssueLastId}";
+        int dataVersion = await GetDataVersionService.GetDataVersionOfTheDay();
+
+        string url = $"EquipmentUpgradeIssues?startId={LatestModel.UpgradeIssueLastId}&minimumDataVersion={dataVersion}";
         List<EquipmentUpgradeIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeIssueModel>>(url);
         
         if (issues is null) return;
@@ -122,7 +134,8 @@ public class ElectronicObserverReportService
     {
         if (LatestModel is null) return;
 
-        string url = $"EquipmentUpgradeCostIssues?startId={LatestModel.UpgradeCostIssueLastId}";
+        int dataVersion = await GetDataVersionService.GetDataVersionOfTheDay();
+        string url = $"EquipmentUpgradeCostIssues?startId={LatestModel.UpgradeCostIssueLastId}&minimumDataVersion={dataVersion}";
         List<EquipmentUpgradeCostIssueModel>? issues = await ElectronicObserverApiService.GetJson<List<EquipmentUpgradeCostIssueModel>>(url);
 
         if (issues is null) return;
