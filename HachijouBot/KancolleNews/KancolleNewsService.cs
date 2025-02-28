@@ -92,14 +92,14 @@ namespace HachijouBot.KancolleNews
             newUpdateModel = newUpdateModel.Where(upd => upd.WasLiveUpdate is false).ToList();
 
 
-            EoUpdateModel? lastNewUpdate = newUpdateModel
+            EoUpdateModel? latestUpdateCurrentState = newUpdateModel
                 .Where(upd => !upd.WasLiveUpdate)
                 .Where(upd => upd.UpdateDate is not null)
                 .Where(upd => upd.UpdateStartTime is not null)
                 .Where(upd => upd.UpdateIsComing() || upd.UpdateInProgress())
-                .MaxBy(upd => upd.UpdateDate);
+                .MinBy(upd => upd.UpdateDate);
 
-            if (lastNewUpdate is null)
+            if (latestUpdateCurrentState is null)
             {
                 return;
             }
@@ -107,53 +107,42 @@ namespace HachijouBot.KancolleNews
             if (subscription.LastUpdateCommitId is null)
             {
                 // Get the last maint : 
-                await PostNewMaintenanceInformation(subscription, lastNewUpdate);
+                await PostNewMaintenanceInformation(subscription, latestUpdateCurrentState);
 
-                if (!string.IsNullOrEmpty(lastNewUpdate.EndTweetLink)) await PostMessage(subscription, $"{lastNewUpdate.EndTweetLink}");
-                else if (!string.IsNullOrEmpty(lastNewUpdate.StartTweetLink)) await PostMessage(subscription, $"{lastNewUpdate.StartTweetLink}");
+                if (!string.IsNullOrEmpty(latestUpdateCurrentState.EndTweetLink)) await PostMessage(subscription, $"{latestUpdateCurrentState.EndTweetLink}");
+                else if (!string.IsNullOrEmpty(latestUpdateCurrentState.StartTweetLink)) await PostMessage(subscription, $"{latestUpdateCurrentState.StartTweetLink}");
 
                 return;
             }
 
             List<EoUpdateModel> oldUpdateModel = await EoUpdateService.GetUpdates(subscription.LastUpdateCommitId);
 
-            EoUpdateModel? lastOldUpdate = oldUpdateModel
-                .Where(upd => !upd.WasLiveUpdate)
-                .Where(upd => upd.UpdateDate is not null)
-                .Where(upd => upd.UpdateStartTime is not null)
-                .Where(upd => upd.UpdateDate <= lastNewUpdate.UpdateDate)
-                .MaxBy(upd => upd.UpdateDate);
+            EoUpdateModel? latestUpdateInPreviousState = oldUpdateModel.Find(upd => upd.Id == latestUpdateCurrentState.Id);
 
             subscription.LastUpdateCommitId = commit.CommitId;
 
-            if (lastOldUpdate is null)
-            {
-                // Do nothing
-                return;
-            }
-
             // New update ?
-            if (lastOldUpdate.Id != lastNewUpdate.Id)
+            if (latestUpdateInPreviousState is null)
             {
-                await PostNewMaintenanceInformation(subscription, lastNewUpdate);
+                await PostNewMaintenanceInformation(subscription, latestUpdateCurrentState);
             }
             // They announced end time ?
-            else if (lastOldUpdate.UpdateEndTime is null && lastNewUpdate.UpdateEndTime is not null)
+            else if (latestUpdateInPreviousState.UpdateEndTime is null && latestUpdateCurrentState.UpdateEndTime is not null)
             {
-                await PostUpdateMaintenanceInformation(subscription, lastNewUpdate, false);
+                await PostUpdateMaintenanceInformation(subscription, latestUpdateCurrentState, false);
             }
             // They announced new end time ? = delay 
-            else if (lastOldUpdate.UpdateEndTime is not null && lastNewUpdate.UpdateEndTime is not null && lastOldUpdate.UpdateEndTime != lastNewUpdate.UpdateEndTime)
+            else if (latestUpdateInPreviousState.UpdateEndTime is not null && latestUpdateCurrentState.UpdateEndTime is not null && latestUpdateInPreviousState.UpdateEndTime != latestUpdateCurrentState.UpdateEndTime)
             {
-                await PostUpdateMaintenanceInformation(subscription, lastNewUpdate, true);
+                await PostUpdateMaintenanceInformation(subscription, latestUpdateCurrentState, true);
             }
             else
             {
                 return;
             }
 
-            if (lastOldUpdate.EndTweetLink != lastNewUpdate.EndTweetLink) await PostMessage(subscription, $"{lastNewUpdate.EndTweetLink}");
-            else if (lastOldUpdate.StartTweetLink != lastNewUpdate.StartTweetLink) await PostMessage(subscription, $"{lastNewUpdate.StartTweetLink}");
+            if (latestUpdateInPreviousState is null || latestUpdateInPreviousState.StartTweetLink != latestUpdateCurrentState.StartTweetLink) await PostMessage(subscription, $"{latestUpdateCurrentState.StartTweetLink}");
+            else if (latestUpdateInPreviousState.EndTweetLink != latestUpdateCurrentState.EndTweetLink) await PostMessage(subscription, $"{latestUpdateCurrentState.EndTweetLink}");
         }
 
         private async Task PostMessage(KancolleNewsSubscriptionModel subscription, string message)
