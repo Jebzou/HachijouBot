@@ -66,7 +66,6 @@ namespace HachijouBot.Commands
             Commands.Clear();
 
             AddCommand(new GetUpgradeCostFromIssuesCommand(Config, ApiService, EoDataService));
-            return;
 
             AddCommand(new AddDanbooruWatcherCommand());
             AddCommand(new ManageDanbooruWatcherCommand());

@@ -173,7 +173,6 @@ namespace HachijouBot
             CustomCommandManager = new SlashCommandManager(this, Configuration, ElectronicObserverApiService, ElectronicObserverDataService);
             Client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
 
-            return Task.CompletedTask;
             Console.WriteLine($"Done loading Discord");
 
             // Load danbooru
