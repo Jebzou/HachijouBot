@@ -142,11 +142,13 @@ public class ElectronicObserverReportService
         if (!issues.Any()) return;
 
         StringBuilder message = new();
-        message.AppendLine("Detected upgrade cost issues : ");
 
-        foreach (EquipmentUpgradeCostIssueModel issue in issues)
+        foreach ((int equipmentId, int shipId) in issues.Select(issue => (issue.EquipmentId, issue.HelperId)).Distinct())
         {
-            await ParseIssues(issue, message);
+            ShipModel? shipModel = await EoDataService.GetShip(shipId);
+            EquipmentModel? eq = await EoDataService.GetEquipment(equipmentId);
+
+            message.AppendLine($"Detected upgrade cost issues for {eq?.NameEN} (#{equipmentId}) with {shipModel?.NameEN} (#{shipId})");
 
             if (message.Length > 1000)
             {
@@ -166,36 +168,6 @@ public class ElectronicObserverReportService
     private async Task UpdateConfig()
     {
         await File.WriteAllTextAsync("data/EoReportConfig.json", JsonSerializer.Serialize(LatestModel));
-    }
-
-    private async Task ParseIssues(EquipmentUpgradeCostIssueModel issue, StringBuilder message)
-    {
-        ShipModel? shipModel = await EoDataService.GetShip(issue.HelperId);
-        EquipmentModel? eq = await EoDataService.GetEquipment(issue.EquipmentId);
-
-        string upgradeStage = issue.UpgradeStage switch
-        {
-            UpgradeStage.From0To5 => "0\uff5e5",
-            UpgradeStage.From6To9 => "6\uff5e9",
-            _ => issue.UpgradeStage.ToString(),
-        };
-
-        message.AppendLine($"## {eq?.NameEN ?? $"#{issue.EquipmentId}"} with {shipModel?.NameEN ?? $"#{issue.HelperId}"} ({upgradeStage})");
-        message.AppendLine($"- {issue.Actual.Fuel} {EmoteDataBase.Fuel} {issue.Actual.Ammo} {EmoteDataBase.Ammo} {issue.Actual.Steel} {EmoteDataBase.Steel} {issue.Actual.Bauxite} {EmoteDataBase.Bauxite}");
-        message.AppendLine($"- {issue.Actual.DevmatCost} {EmoteDataBase.DevMats} (slider: {issue.Actual.SliderDevmatCost} {EmoteDataBase.DevMats}) {issue.Actual.ImproveMatCost} {EmoteDataBase.Screws} (slider: {issue.Actual.SliderImproveMatCost} {EmoteDataBase.Screws})");
-
-        foreach (EquipmentUpgradeCostItemModel consumedEquipmentReq in issue.Actual.EquipmentDetail)
-        {
-            EquipmentModel? requiredEquipment = await EoDataService.GetEquipment(consumedEquipmentReq.Id);
-
-            message.AppendLine($"- {requiredEquipment?.NameEN ?? $"#{consumedEquipmentReq.Id}"} x{consumedEquipmentReq.Count}");
-        }
-
-        foreach (EquipmentUpgradeCostItemModel consumedItemId in issue.Actual.ConsumableDetail)
-        {
-            UseItemId useItem = (UseItemId)consumedItemId.Id;
-            message.AppendLine($"- {useItem} x{consumedItemId.Count}");
-        }
     }
 
     private async Task ParseIssues(EquipmentUpgradeIssueModel issue, StringBuilder message)

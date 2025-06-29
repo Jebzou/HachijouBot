@@ -38,6 +38,7 @@ namespace HachijouBot
 
         public ElectronicObserverReportService? ElectronicObserverReportService { get; private set; }
         public ElectronicObserverApiService ElectronicObserverApiService { get; private set; }
+        private EoDataService ElectronicObserverDataService { get; set; }
 
         public async Task Initialize()
         {
@@ -167,10 +168,12 @@ namespace HachijouBot
             Console.WriteLine($"Connected");
             
             LoadEmotes();
+            LoadEoReportService();
 
-            CustomCommandManager = new SlashCommandManager(this);
+            CustomCommandManager = new SlashCommandManager(this, Configuration, ElectronicObserverApiService, ElectronicObserverDataService);
             Client.SlashCommandExecuted += CustomCommandManager.ExecuteSlashCommand;
 
+            return Task.CompletedTask;
             Console.WriteLine($"Done loading Discord");
 
             // Load danbooru
@@ -186,8 +189,6 @@ namespace HachijouBot
             Console.WriteLine($"Load news service");
             KancolleNewsService = new KancolleNewsService();
             Console.WriteLine($"Done loading news service");
-            
-            LoadEoReportService();
 
             return Task.CompletedTask;
         }
@@ -199,8 +200,8 @@ namespace HachijouBot
 
             Console.WriteLine("Load EO issue report service");
             ElectronicObserverApiService = new(Configuration["EoApiUrl"], Configuration["EoApiSecret"]);
-            EoDataService data = new EoDataService();
-            ElectronicObserverReportService = new(ElectronicObserverApiService, Configuration, data);
+            ElectronicObserverDataService = new EoDataService();
+            ElectronicObserverReportService = new(ElectronicObserverApiService, Configuration, ElectronicObserverDataService);
             Console.WriteLine("Done loading EO issue report service");
         }
 

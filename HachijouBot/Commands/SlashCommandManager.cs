@@ -1,18 +1,15 @@
-﻿using Discord;
-using Discord.Net;
+﻿using Discord.Net;
 using Discord.WebSocket;
 using HachijouBot.Commands.Danbooru;
+using HachijouBot.Commands.KancolleNews;
 using HachijouBot.Commands.ManageDatabase;
 using HachijouBot.Commands.MapInfo;
 using HachijouBot.Commands.Reminder;
 using HachijouBot.Commands.Roles;
 using HachijouBot.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HachijouBot.Commands.KancolleNews;
+using HachijouBot.ElectronicObserverReport;
+using HachijouBot.KancolleNews;
+using Microsoft.Extensions.Configuration;
 
 namespace HachijouBot.Commands
 {
@@ -20,11 +17,17 @@ namespace HachijouBot.Commands
     {
         private List<Command> Commands = new List<Command>();
 
-        private Hachijou Hachijou;
+        private Hachijou Hachijou { get; }
+        private IConfiguration Config { get; }
+        private ElectronicObserverApiService ApiService { get; }
+        private EoDataService EoDataService { get; }
 
-        public SlashCommandManager(Hachijou hachijou)
+        public SlashCommandManager(Hachijou hachijou, IConfiguration config, ElectronicObserverApiService apiService, EoDataService eoDataService)
         {
             Hachijou = hachijou;
+            Config = config;
+            ApiService = apiService;
+            EoDataService = eoDataService;
 
             // Initialize all commands
             InitializeAllCommands();
@@ -62,12 +65,15 @@ namespace HachijouBot.Commands
 
             Commands.Clear();
 
+            AddCommand(new GetUpgradeCostFromIssuesCommand(Config, ApiService, EoDataService));
+            return;
+
             AddCommand(new AddDanbooruWatcherCommand());
             AddCommand(new ManageDanbooruWatcherCommand());
             AddCommand(new GetRandomPicture());
 
-            AddCommand(new AddCommandCommand()); 
-            AddCommand(new DeleteCommandCommand()); 
+            AddCommand(new AddCommandCommand());
+            AddCommand(new DeleteCommandCommand());
 
             AddCommand(new AddRoleCommandCommand());
 

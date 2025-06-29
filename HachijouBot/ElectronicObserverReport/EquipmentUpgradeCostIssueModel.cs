@@ -16,7 +16,7 @@ public class EquipmentUpgradeCostIssueModel
 
     [JsonPropertyName("equipmentId")] public int EquipmentId { get; set; }
 
-    [JsonPropertyName("upgradeStage")] public UpgradeStage UpgradeStage { get; set; }
+    [JsonPropertyName("upgradeLevel")] public UpgradeLevel UpgradeLevel { get; set; }
 
     [JsonPropertyName("id")] public int Id { get; set; }
 
@@ -41,7 +41,7 @@ public class EquipmentUpgradeCostIssueModel
         if (other.DataVersion != DataVersion) return false;
         if (other.HelperId != HelperId) return false;
         if (other.EquipmentId != EquipmentId) return false;
-        if (other.UpgradeStage != UpgradeStage) return false;
+        if (other.UpgradeLevel != UpgradeLevel) return false;
 
         return true;
     }
@@ -54,7 +54,7 @@ public class EquipmentUpgradeCostIssueModel
         hashCode.Add(DataVersion);
         hashCode.Add(HelperId);
         hashCode.Add(EquipmentId);
-        hashCode.Add(UpgradeStage);
+        hashCode.Add(UpgradeLevel);
 
         return hashCode.ToHashCode();
     }
